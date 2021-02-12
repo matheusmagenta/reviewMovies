@@ -1,4 +1,4 @@
-import apiKey from "./config.js";
+const apiKey = "21545d3f8c898a2b27bafd3db0854b12";
 
 // example of api request with my api_key
 // https://api.themoviedb.org/3/movie/550?api_key=21545d3f8c898a2b27bafd3db0854b12
@@ -10,7 +10,7 @@ const API_URL = "https://api.themoviedb.org/3/";
 const id = "";
 const dataRequest = `${API_URL}movie/${560}?api_key=${apiKey}`;
 
-console.log(dataRequest);
+//console.log(dataRequest);
 
 ////////////////
 // MOVIE VIEW //
@@ -80,7 +80,7 @@ const createResultObject = function (movie) {
 };
 
 // get results
-async function getResults(querySearch) {
+const getResults = async function (querySearch) {
   state.search.querySearch = querySearch;
   state.search.results = []; //clear other results
   let response = await fetch(
@@ -93,10 +93,10 @@ async function getResults(querySearch) {
   dataResults.results.map((result) =>
     state.search.results.push(createResultObject(result))
   );
-}
+};
 
 // show results
-const showResults = function (state) {
+const showResults = async function (state) {
   parentElement = document.querySelector(".movie");
   console.log(state);
   state.search.results.map((result) => {
@@ -108,3 +108,20 @@ const showResults = function (state) {
     parentElement.insertAdjacentHTML("beforeend", markup);
   });
 };
+
+////////////
+// SEARCH //
+////////////
+
+const getSearchQuery = async function () {
+  // selecting the input element and get its value
+  const querySearch = document.getElementById("search").value;
+  await getResults(querySearch);
+  await showResults(state);
+  // displaying the value
+  //console.log(querySearch);
+};
+
+//let btnSearch = document.querySelector(".search");
+//console.log(btnSearch);
+//btnSearch.addEventListener("click", getSearchQuery);
