@@ -44,11 +44,11 @@ const getMovie = async function (id) {
   let data = await response.json();
   console.log("json: ", data);
   state.movie = createMovieObject(data);
-  await showMovie(state);
+  await showMovieView(state);
 };
 
 // show data in the view
-const showMovie = async function (state) {
+const showMovieView = function (state) {
   parentElement = document.querySelector(".movie");
   clearResults();
   const markup = `
@@ -83,7 +83,7 @@ const createResultObject = function (movie) {
 };
 
 // get results
-const getResults = async function (querySearch) {
+const loadResults = async function (querySearch) {
   state.search.querySearch = querySearch;
   state.search.results = []; //clear other results
   let response = await fetch(
@@ -99,7 +99,7 @@ const getResults = async function (querySearch) {
 };
 
 // show results
-const showResults = async function (state) {
+const showResultsView = function (state) {
   parentElement = document.querySelector(".movie");
   console.log(state);
   state.search.results.map((movie) => {
@@ -117,27 +117,27 @@ const showResults = async function (state) {
 // SEARCH //
 ////////////
 
-const getSearchQuery = async function () {
+const loadSearchQuery = async function () {
   // selecting the input element and get its value
   clearResults();
   const querySearch = document.getElementById("search").value;
 
-  await getResults(querySearch);
+  await loadResults(querySearch);
 
   // displaying results
-  await showResults(state);
+  await showResultsView(state);
 };
 
 //let btnSearch = document.querySelector(".search");
 //console.log(btnSearch);
-//btnSearch.addEventListener("click", getSearchQuery);
+//btnSearch.addEventListener("click"load);
 
 ///////////
 // CLEAR //
 ///////////
 
 // function to clear results
-const clearResults = async function () {
+const clearResults = function () {
   parentElement = document.querySelector(".movie");
   parentElement.innerHTML = "";
 };
@@ -150,6 +150,7 @@ const clearResults = async function () {
 // fix submit input
 // fix event listeners on button
 // implement bookmark - my movies
+// implement filters to search or results
 // implement stars feature
 // implement own review feature
 // implement user login auth feature
