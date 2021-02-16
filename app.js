@@ -1,3 +1,24 @@
+//////////////////////////////////////////
+/// TASKS - TO BE DONE
+// create model, views and controller (MVC pattern)
+// create flexbox and responsive design
+// create topbar: mymovies, useraccount
+// refactor with classes
+// create back button in movie view
+// create pagination
+// improve data model
+// fix submit input
+// fix event listeners on button
+// implement bookmark - my movies
+// implement filters to search or results
+// implement stars feature with SLIDER
+// implement own review feature
+// implement user login auth feature
+// sort search results
+// sort bookmark results
+// search only in bookmark results
+// recommendation system
+
 // example of api request with my api_key
 // https://api.themoviedb.org/3/movie/550?api_key=21545d3f8c898a2b27bafd3db0854b12
 
@@ -9,11 +30,6 @@ const apiKey = "21545d3f8c898a2b27bafd3db0854b12";
 const id = "";
 const dataRequest = `${API_URL}movie/${560}?api_key=${apiKey}`;
 
-//console.log(dataRequest);
-
-////////////////
-// MOVIE VIEW //
-////////////////
 const state = {
   movie: {},
   search: {
@@ -21,6 +37,10 @@ const state = {
     results: [],
   },
 };
+
+////////////////
+// MOVIE VIEW //
+////////////////
 
 // creates movie object model
 const createMovieObject = function (data) {
@@ -51,12 +71,27 @@ const showMovieView = function (state) {
   parentElement = document.querySelector(".display");
   clearDisplay();
   const markup = `
+    <div class="show-movie">
       <h1 class="movie-title">${state.movie.title}</h1>
       <p class="movie-year">${state.movie.year.slice(0, 4)}</p>
       <span class="vote-average">${state.movie.vote_average}</span>
       <p class="overview">
       ${state.movie.overview}
       </p>
+      <a href="#" class="btn btn-success btn-sm add">add</a> 
+      <form>
+      <div class="form-group">
+        <label for="myReview">write your own review</label>
+        <textarea class="form-control" id="myReview" rows="3"></textarea>
+      </div>
+      <input
+          type="submit"
+          id="submit-myreview"
+          value="submit myReview"
+          class="btn btn-primary btn-block"
+        />
+      </form>
+    </div>  
     `;
   parentElement.insertAdjacentHTML("beforeend", markup);
 };
@@ -138,18 +173,36 @@ const clearDisplay = function () {
   display.innerHTML = "";
 };
 
-//////////////////////////////////////////
-/// TASKS - TO BE DONE
-// create model, views and controller (MVC)
-// create back button in movie view
-// improve data model
-// fix submit input
-// fix event listeners on button
-// implement bookmark - my movies
-// implement filters to search or results
-// implement stars feature with SLIDER
-// implement own review feature
-// implement user login auth feature
-// sort search results
-// sort bookmark results
-// search only in bookmark results
+///////////////////
+// MYMOVIES VIEW //
+///////////////////
+
+const movieShelf = [];
+
+// adding movie to list mymovies with event propagation
+const btnAddMovie = document.querySelector(".display");
+btnAddMovie.addEventListener("click", function (e) {
+  if (e.target.classList.contains("add")) {
+    movieShelf.push(state.movie);
+    console.log(movieShelf);
+  }
+});
+
+// showing mymovies list
+const btnMyMoviesBar = document.querySelector("body");
+btnMyMoviesBar.addEventListener("click", function (e) {
+  parentElement = document.querySelector(".display");
+  if (e.target.classList.contains("my-movies")) {
+    clearDisplay();
+    console.log(e.target);
+    movieShelf.forEach((movie) => {
+      const markup = `
+  <h1 class="movie-title">${movie.title}</h1>
+  <a onclick="getMovie(${movie.id})" href="#">see details</a>
+  <p class="movie-year">${movie.year.slice(0, 4)}</p>
+  <span class="vote-average">${movie.vote_average}</span>
+  `;
+      parentElement.insertAdjacentHTML("beforeend", markup);
+    });
+  }
+});
