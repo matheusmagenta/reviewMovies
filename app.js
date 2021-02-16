@@ -1,14 +1,16 @@
+"use strict";
 //////////////////////////////////////////
 /// TASKS - TO BE DONE
 // create model, views and controller (MVC pattern)
 // create flexbox and responsive design
 // create topbar: mymovies, useraccount
-// refactor with classes
-// create back button in movie view
+// OK - refactor with classes and state
+// create back to results button in movie view
 // create pagination
 // improve data model
 // fix submit input
-// fix event listeners on button
+// show alert after adding movie to mymovies list
+// OK - fix event listeners on button
 // implement bookmark - my movies
 // implement filters to search or results
 // implement stars feature with SLIDER
@@ -30,123 +32,45 @@ const apiKey = "21545d3f8c898a2b27bafd3db0854b12";
 const id = "";
 const dataRequest = `${API_URL}movie/${560}?api_key=${apiKey}`;
 
+//////////////////////
+// STATE MANAGEMENT //
+//////////////////////
+
 const state = {
   movie: {},
   search: {
     querySearch: "",
     results: [],
   },
+  movieShelf: [],
 };
 
-////////////////
-// MOVIE VIEW //
-////////////////
+/////////////////
+// MOVIE MODEL //
+/////////////////
 
-// creates movie object model
-const createMovieObject = function (data) {
-  const movie = data;
-  return {
-    title: movie.title,
-    id: movie.id,
-    year: movie.release_date,
-    overview: movie.overview,
-    poster_path: movie.poster_path,
-    origin_country: movie.origin_country,
-    vote_average: movie.vote_average,
-  };
-};
+// movie class: represents a movie
+class Movie {
+  constructor(title, id, year, overview, poster_path, vote_average) {
+    (this.title = title),
+      (this.id = id),
+      (this.year = year),
+      (this.overview = overview),
+      (this.poster_path = poster_path),
+      (this.vote_average = vote_average);
+  }
+}
 
-// function responsible for fetch the movie data from the TMDb api
-const getMovie = async function (id) {
-  let response = await fetch(`${API_URL}movie/${id}?api_key=${apiKey}`);
-  //console.log("response: ", response);
-  let data = await response.json();
-  //console.log("json: ", data);
-  state.movie = createMovieObject(data);
-  showMovieView(state);
-};
+// selecting elements from the DOM
+const mainView = document.querySelector(".mainView");
+const body = document.querySelector("body");
 
-// show data in the view
-const showMovieView = function (state) {
-  parentElement = document.querySelector(".display");
-  clearDisplay();
-  const markup = `
-    <div class="show-movie">
-      <h1 class="movie-title">${state.movie.title}</h1>
-      <p class="movie-year">${state.movie.year.slice(0, 4)}</p>
-      <span class="vote-average">${state.movie.vote_average}</span>
-      <p class="overview">
-      ${state.movie.overview}
-      </p>
-      <a href="#" class="btn btn-success btn-sm add">add</a> 
-      <form>
-      <div class="form-group">
-        <label for="myReview">write your own review</label>
-        <textarea class="form-control" id="myReview" rows="3"></textarea>
-      </div>
-      <input
-          type="submit"
-          id="submit-myreview"
-          value="submit myReview"
-          class="btn btn-primary btn-block"
-        />
-      </form>
-    </div>  
-    `;
-  parentElement.insertAdjacentHTML("beforeend", markup);
-};
+//////////////////////////////////
+// FUNCTIONS
+/////////////////////////////////
 
-//////////////////
-// RESULTS VIEW //
-//////////////////
-
-// create results
-const createResultObject = function (movie) {
-  return {
-    title: movie.title,
-    id: movie.id,
-    year: movie.release_date,
-    vote_average: movie.vote_average,
-  };
-};
-
-// get results
-const loadResults = async function (querySearch) {
-  state.search.querySearch = querySearch;
-  state.search.results = []; //clear other results
-  let response = await fetch(
-    `${API_URL}search/movie?api_key=${apiKey}&query=${state.search.querySearch}`
-  );
-  // console.log("response: ", response);
-  let dataResults = await response.json();
-  //console.log("results: ", dataResults.results);
-
-  dataResults.results.map((result) =>
-    state.search.results.push(createResultObject(result))
-  );
-  showResultsView(state);
-};
-
-// show results
-const showResultsView = function (state) {
-  clearDisplay();
-  parentElement = document.querySelector(".display");
-  //console.log(state);
-  state.search.results.map((movie) => {
-    markup = `
-  <h1 class="movie-title">${movie.title}</h1>
-  <a onclick="getMovie(${movie.id})" href="#">see details</a>
-  <p class="movie-year">${movie.year.slice(0, 4)}</p>
-  <span class="vote-average">${movie.vote_average}</span>
-  `;
-    parentElement.insertAdjacentHTML("beforeend", markup);
-  });
-};
-
-////////////
-// SEARCH //
-////////////
-
+// 1. USER SEARCHS FOR A MOVIE
+// 1a. user types a keyword on the search form
 const inputSearch = document.querySelector("#movie-form");
 
 inputSearch.addEventListener("submit", (e) => {
@@ -156,21 +80,104 @@ inputSearch.addEventListener("submit", (e) => {
   // get search value
   let querySearch = document.querySelector("#movie-search").value;
 
-  console.log(querySearch);
+  //console.log(querySearch);
   loadResults(querySearch);
 
   // clear search form
   document.querySelector("#movie-search").value = "";
 });
 
+// 1b. using the keyword, get results from api search
+const loadResults = async function (querySearch) {
+  state.search.querySearch = querySearch;
+  state.search.results = []; //clear other results
+  let response = await fetch(
+    `${API_URL}search/movie?api_key=${apiKey}&query=${state.search.querySearch}`
+  );
+  // console.log("response: ", response);
+  let dataResults = await response.json();
+  console.log("results: ", dataResults.results);
+
+  dataResults.results.forEach((result) => {
+    //console.log(result);
+    state.search.results.push(
+      new Movie(
+        result.title,
+        result.id,
+        result.release_date,
+        result.overview,
+        result.poster_path,
+        result.vote_average
+      )
+    );
+  });
+  showResultsView(state);
+};
+
+// 1c. after receive data from API, show results on the page
+const showResultsView = function (state) {
+  clearMainView();
+  // parentElement = document.querySelector(".body");
+
+  state.search.results.map((movie) => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+  <h1 class="movie-title">${movie.title}</h1>
+  <a onclick="showMovieView(${movie.id})" href="#">see details</a>
+  <p class="movie-year">${movie.year.slice(0, 4)}</p>
+  <p class="vote-average">${movie.vote_average}</p>
+  `;
+    mainView.appendChild(div);
+  });
+};
+
+////////////////////////////////
+// USER CLICKS TO SEE MOVIE DETAILS
+
+// show data in the view
+const showMovieView = function (id) {
+  clearMainView();
+  // filter results with id of the movie clicked
+  const movie = state.search.results.filter(function (el) {
+    return el.id === id;
+  });
+
+  //update the state with the movie clicked
+  state.movie = movie[0];
+
+  // show the movie clicked in the view
+  const div = document.createElement("div");
+  div.innerHTML = `
+    <h1 class="movie-title">${state.movie.title}</h1>
+    <p class="movie-year">${state.movie.year.slice(0, 4)}</p>
+    <p class="vote-average">${state.movie.vote_average}</p>
+    <p class="overview">
+    ${state.movie.overview}
+    </p>
+    <a href="#" class="btn btn-success btn-sm add">add</a> 
+    <form>
+    <div class="form-group">
+      <label for="myReview">write your own review</label>
+      <textarea class="form-control" id="myReview" rows="3"></textarea>
+    </div>
+    <input
+        type="submit"
+        id="submit-myreview"
+        value="submit myReview"
+        class="btn btn-primary btn-block"
+      />
+    </form>
+    `;
+  mainView.appendChild(div);
+};
+
 ///////////
 // CLEAR //
 ///////////
 
 // function to clear results
-const clearDisplay = function () {
-  const display = document.querySelector(".display");
-  display.innerHTML = "";
+const clearMainView = function () {
+  mainView.innerHTML = "";
 };
 
 ///////////////////
@@ -180,29 +187,28 @@ const clearDisplay = function () {
 const movieShelf = [];
 
 // adding movie to list mymovies with event propagation
-const btnAddMovie = document.querySelector(".display");
+const btnAddMovie = document.querySelector(".mainView");
 btnAddMovie.addEventListener("click", function (e) {
   if (e.target.classList.contains("add")) {
-    movieShelf.push(state.movie);
-    console.log(movieShelf);
+    state.movieShelf.push(state.movie);
+    console.log(state.movieShelf);
   }
 });
 
 // showing mymovies list
-const btnMyMoviesBar = document.querySelector("body");
-btnMyMoviesBar.addEventListener("click", function (e) {
-  parentElement = document.querySelector(".display");
+body.addEventListener("click", function (e) {
   if (e.target.classList.contains("my-movies")) {
-    clearDisplay();
-    console.log(e.target);
-    movieShelf.forEach((movie) => {
-      const markup = `
-  <h1 class="movie-title">${movie.title}</h1>
-  <a onclick="getMovie(${movie.id})" href="#">see details</a>
-  <p class="movie-year">${movie.year.slice(0, 4)}</p>
-  <span class="vote-average">${movie.vote_average}</span>
-  `;
-      parentElement.insertAdjacentHTML("beforeend", markup);
+    clearMainView();
+    //console.log(e.target);
+    state.movieShelf.forEach((movie) => {
+      const div = document.createElement("div");
+      div.innerHTML = `
+    <h1 class="movie-title">${movie.title}</h1>
+    <a onclick="showMovieView(${movie.id})" href="#">see details</a>
+    <p class="movie-year">${movie.year.slice(0, 4)}</p>
+    <p class="vote-average">${movie.vote_average}</p>
+    `;
+      mainView.appendChild(div);
     });
   }
 });
