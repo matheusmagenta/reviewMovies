@@ -1,5 +1,3 @@
-const apiKey = "21545d3f8c898a2b27bafd3db0854b12";
-
 // example of api request with my api_key
 // https://api.themoviedb.org/3/movie/550?api_key=21545d3f8c898a2b27bafd3db0854b12
 
@@ -7,6 +5,7 @@ const apiKey = "21545d3f8c898a2b27bafd3db0854b12";
 // https://javascript.info/fetch
 
 const API_URL = "https://api.themoviedb.org/3/";
+const apiKey = "21545d3f8c898a2b27bafd3db0854b12";
 const id = "";
 const dataRequest = `${API_URL}movie/${560}?api_key=${apiKey}`;
 
@@ -40,17 +39,17 @@ const createMovieObject = function (data) {
 // function responsible for fetch the movie data from the TMDb api
 const getMovie = async function (id) {
   let response = await fetch(`${API_URL}movie/${id}?api_key=${apiKey}`);
-  console.log("response: ", response);
+  //console.log("response: ", response);
   let data = await response.json();
-  console.log("json: ", data);
+  //console.log("json: ", data);
   state.movie = createMovieObject(data);
-  await showMovieView(state);
+  showMovieView(state);
 };
 
 // show data in the view
 const showMovieView = function (state) {
-  parentElement = document.querySelector(".movie");
-  clearResults();
+  parentElement = document.querySelector(".display");
+  clearDisplay();
   const markup = `
       <h1 class="movie-title">${state.movie.title}</h1>
       <p class="movie-year">${state.movie.year.slice(0, 4)}</p>
@@ -61,12 +60,6 @@ const showMovieView = function (state) {
     `;
   parentElement.insertAdjacentHTML("beforeend", markup);
 };
-
-// get value from search
-function getValue() {
-  const nameValue = document.getElementById(".search").getValue;
-  console.log(nameValue);
-}
 
 //////////////////
 // RESULTS VIEW //
@@ -89,19 +82,21 @@ const loadResults = async function (querySearch) {
   let response = await fetch(
     `${API_URL}search/movie?api_key=${apiKey}&query=${state.search.querySearch}`
   );
-  //console.log("response: ", response);
+  // console.log("response: ", response);
   let dataResults = await response.json();
   //console.log("results: ", dataResults.results);
 
   dataResults.results.map((result) =>
     state.search.results.push(createResultObject(result))
   );
+  showResultsView(state);
 };
 
 // show results
 const showResultsView = function (state) {
-  parentElement = document.querySelector(".movie");
-  console.log(state);
+  clearDisplay();
+  parentElement = document.querySelector(".display");
+  //console.log(state);
   state.search.results.map((movie) => {
     markup = `
   <h1 class="movie-title">${movie.title}</h1>
@@ -117,29 +112,30 @@ const showResultsView = function (state) {
 // SEARCH //
 ////////////
 
-const loadSearchQuery = async function () {
-  // selecting the input element and get its value
-  clearResults();
-  const querySearch = document.getElementById("search").value;
+const inputSearch = document.querySelector("#movie-form");
 
-  await loadResults(querySearch);
+inputSearch.addEventListener("submit", (e) => {
+  // prevent actual submit
+  e.preventDefault();
 
-  // displaying results
-  await showResultsView(state);
-};
+  // get search value
+  let querySearch = document.querySelector("#movie-search").value;
 
-//let btnSearch = document.querySelector(".search");
-//console.log(btnSearch);
-//btnSearch.addEventListener("click"load);
+  console.log(querySearch);
+  loadResults(querySearch);
+
+  // clear search form
+  document.querySelector("#movie-search").value = "";
+});
 
 ///////////
 // CLEAR //
 ///////////
 
 // function to clear results
-const clearResults = function () {
-  parentElement = document.querySelector(".movie");
-  parentElement.innerHTML = "";
+const clearDisplay = function () {
+  const display = document.querySelector(".display");
+  display.innerHTML = "";
 };
 
 //////////////////////////////////////////
@@ -151,7 +147,7 @@ const clearResults = function () {
 // fix event listeners on button
 // implement bookmark - my movies
 // implement filters to search or results
-// implement stars feature
+// implement stars feature with SLIDER
 // implement own review feature
 // implement user login auth feature
 // sort search results
