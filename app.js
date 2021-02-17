@@ -1,25 +1,4 @@
 "use strict";
-//////////////////////////////////////////
-/// TASKS - TO BE DONE
-// create model, views and controller (MVC pattern)
-// create flexbox and responsive design
-// create topbar: mymovies, useraccount
-// OK - refactor with classes and state
-// create back to results button in movie view
-// create pagination
-// improve data model
-// fix submit input
-// show alert after adding movie to mymovies list
-// OK - fix event listeners on button
-// implement bookmark - my movies
-// implement filters to search or results
-// implement stars feature with SLIDER
-// implement own review feature
-// implement user login auth feature
-// sort search results
-// sort bookmark results
-// search only in bookmark results
-// recommendation system
 
 // example of api request with my api_key
 // https://api.themoviedb.org/3/movie/550?api_key=21545d3f8c898a2b27bafd3db0854b12
@@ -132,9 +111,9 @@ const showResultsView = function (state) {
 };
 
 ////////////////////////////////
-// USER CLICKS TO SEE MOVIE DETAILS
+// 2. USER CLICKS TO SEE MOVIE DETAILS
 
-// show data in the view
+// 2a. show data in the view
 const showMovieView = function (id) {
   clearMainView();
   // filter results with id of the movie clicked
@@ -167,13 +146,14 @@ const showMovieView = function (id) {
         class="btn btn-primary btn-block"
       />
     </form>
+    <a href="#" class="btn btn-success btn-sm" onclick="showResultsView(state)">back to results</a>
     `;
   mainView.appendChild(div);
 };
 
-///////////
-// CLEAR //
-///////////
+////////////////
+// CLEAR VIEW //
+////////////////
 
 // function to clear results
 const clearMainView = function () {
@@ -184,7 +164,7 @@ const clearMainView = function () {
 // MYMOVIES VIEW //
 ///////////////////
 
-const movieShelf = [];
+// USER ADDS MOVIE TO MYMOVIES LIST
 
 // adding movie to list mymovies with event propagation
 const btnAddMovie = document.querySelector(".mainView");
