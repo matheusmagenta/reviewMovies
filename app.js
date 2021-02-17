@@ -134,6 +134,7 @@ const showMovieView = function (id) {
     ${state.movie.overview}
     </p>
     <a href="#" class="btn btn-success btn-sm add">add</a> 
+    <a href="#" class="btn btn-danger btn-sm remove">remove</a> 
     <form>
     <div class="form-group">
       <label for="myReview">write your own review</label>
@@ -165,21 +166,33 @@ const clearMainView = function () {
 ///////////////////
 
 // USER ADDS MOVIE TO MYMOVIES LIST
-
 // adding movie to list mymovies with event propagation
 const btnAddMovie = document.querySelector(".mainView");
 btnAddMovie.addEventListener("click", function (e) {
   if (e.target.classList.contains("add")) {
-    state.movieShelf.push(state.movie);
-    console.log(state.movieShelf);
+    MovieShelf.addMovies(state.movie);
+  }
+});
+
+// USER REMOVES MOVIE OF MYMOVIES LIST
+// removie movie of list mymovies with event propagation
+const btnRemoveMovie = document.querySelector(".mainView");
+btnRemoveMovie.addEventListener("click", function (e) {
+  if (e.target.classList.contains("remove")) {
+    MovieShelf.removeMovies(state.movie.id);
   }
 });
 
 // showing mymovies list
 body.addEventListener("click", function (e) {
   if (e.target.classList.contains("my-movies")) {
+    // clearing main view
     clearMainView();
-    //console.log(e.target);
+
+    // getting my-movies list from local storage
+    state.movieShelf = MovieShelf.getMovies();
+
+    // iterating over the list and displaying each item
     state.movieShelf.forEach((movie) => {
       const div = document.createElement("div");
       div.innerHTML = `
@@ -192,3 +205,36 @@ body.addEventListener("click", function (e) {
     });
   }
 });
+
+///////////////////
+// LOCAL STORAGE //
+///////////////////
+
+class MovieShelf {
+  static getMovies() {
+    if (localStorage.getItem("state.movieShelf") === null) {
+      state.movieShelf = [];
+    } else {
+      state.movieShelf = JSON.parse(localStorage.getItem("state.movieShelf"));
+    }
+    return state.movieShelf;
+  }
+
+  static addMovies(movie) {
+    const movieShelf = MovieShelf.getMovies();
+    movieShelf.push(movie);
+    localStorage.setItem("state.movieShelf", JSON.stringify(state.movieShelf));
+  }
+
+  static removeMovies(id) {
+    const movieShelf = MovieShelf.getMovies();
+
+    movieShelf.forEach((movie, index) => {
+      if (movie.id === id) {
+        movieShelf.splice(index, 1);
+      }
+    });
+
+    localStorage.setItem("state.movieShelf", JSON.stringify(state.movieShelf));
+  }
+}
