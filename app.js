@@ -100,8 +100,12 @@ const showResultsView = function (state) {
 
   state.search.results.map((movie) => {
     const div = document.createElement("div");
+    div.className = "movie-item";
     div.innerHTML = `
-  <h1 class="movie-title">${movie.title}</h1>
+  <img src="https://image.tmdb.org/t/p/w500/${
+    movie.poster_path
+  }" alt="movie-poster" class="movie-poster">
+  <p class="movie-title">${movie.title}</p>
   <a onclick="showMovieView(${movie.id})" href="#">see details</a>
   <p class="movie-year">${movie.year.slice(0, 4)}</p>
   <p class="vote-average">${movie.vote_average}</p>
@@ -127,7 +131,10 @@ const showMovieView = function (id) {
   // show the movie clicked in the view
   const div = document.createElement("div");
   div.innerHTML = `
-    <h1 class="movie-title">${state.movie.title}</h1>
+  <img src="https://image.tmdb.org/t/p/w500/${
+    state.movie.poster_path
+  }" alt="movie-poster" class="movie-poster">
+    <p class="movie-title">${state.movie.title}</p>
     <p class="movie-year">${state.movie.year.slice(0, 4)}</p>
     <p class="vote-average">${state.movie.vote_average}</p>
     <p class="overview">
@@ -195,8 +202,9 @@ body.addEventListener("click", function (e) {
     // iterating over the list and displaying each item
     state.movieShelf.forEach((movie) => {
       const div = document.createElement("div");
+      div.className = "movie-item";
       div.innerHTML = `
-    <h1 class="movie-title">${movie.title}</h1>
+    <p class="movie-title">${movie.title}</p>
     <a onclick="showMovieView(${movie.id})" href="#">see details</a>
     <p class="movie-year">${movie.year.slice(0, 4)}</p>
     <p class="vote-average">${movie.vote_average}</p>
