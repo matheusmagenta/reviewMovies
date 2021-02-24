@@ -13,6 +13,24 @@
 }
 
 .movie-poster {
-  width: 50px;
-  height: 90px;
+  width: 150px;
+  height: 190px;
+}
+
+.movie-details {
+  text-align: center;
+  width: 700px;
+  height: 500px;
+}
+
+.btn-search {
+  display: inline-flex;
+}
+
+.btn-back {
+  margin: 10px;
+}
+
+.btn-add {
+  margin: 10px;
 }

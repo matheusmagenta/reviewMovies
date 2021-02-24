@@ -21,7 +21,7 @@ const state = {
     querySearch: "",
     results: [],
   },
-  movieShelf: [],
+  movieStorage: [],
 };
 
 /////////////////
@@ -30,13 +30,14 @@ const state = {
 
 // movie class: represents a movie
 class Movie {
-  constructor(title, id, year, overview, poster_path, vote_average) {
+  constructor(title, id, year, overview, poster_path, vote_average, review) {
     (this.title = title),
       (this.id = id),
       (this.year = year),
       (this.overview = overview),
       (this.poster_path = poster_path),
-      (this.vote_average = vote_average);
+      (this.vote_average = vote_average),
+      (this.review = review);
   }
 }
 
@@ -75,7 +76,7 @@ const loadResults = async function (querySearch) {
   );
   // console.log("response: ", response);
   let dataResults = await response.json();
-  console.log("results: ", dataResults.results);
+  //console.log("results: ", dataResults.results);
 
   dataResults.results.forEach((result) => {
     //console.log(result);
@@ -138,9 +139,28 @@ const showMovieView = async function (id) {
     dataResult.vote_average
   );
 
+  const movieId = state.movie.id;
+  // check if the movie is already in the movieStorage
+  const isMovieStored = function () {
+    // compare id of movie on the view and ids in the storage
+    const checkMovieStored = state.movieStorage.filter(
+      (movie) => movie.id === dataResult.id
+    );
+    if (checkMovieStored.length > 0) {
+      console.log("movie already in the storage");
+      return true;
+    } else {
+      console.log("movie is not in the storage");
+      return false;
+    }
+  };
+  isMovieStored(movieId);
+
   // show the movie clicked in the view
   const div = document.createElement("div");
-  div.innerHTML = `
+  div.className = "movie-details";
+
+  const markupInfo = `
   <img src="https://image.tmdb.org/t/p/w500/${
     state.movie.poster_path
   }" alt="movie-poster" class="movie-poster">
@@ -149,23 +169,27 @@ const showMovieView = async function (id) {
     <p class="vote-average">${state.movie.vote_average}</p>
     <p class="overview">
     ${state.movie.overview}
-    </p>
-    <a href="#" class="btn btn-success btn-sm add">add</a> 
-    <a href="#" class="btn btn-danger btn-sm remove">remove</a> 
-    <form>
+    </p>`;
+
+  const markupRemove =
+    '<a href="#" class="btn btn-danger btn-sm remove">remove</a>';
+
+  const markupAdd = `
+  <a href="#" class="btn btn-outline-warning btn-md watch-later">watch later list</a>
+  <form>
     <div class="form-group">
-      <label for="myReview">write your own review</label>
-      <textarea class="form-control" id="myReview" rows="3"></textarea>
+      <label for="myReview"></label>
+      <textarea class="form-control" id="myReview" rows="3" placeholder="write my review"></textarea>
     </div>
-    <input
-        type="submit"
-        id="submit-myreview"
-        value="submit myReview"
-        class="btn btn-primary btn-block"
-      />
-    </form>
-    <a href="#" class="btn btn-success btn-sm" onclick="showResultsView(state)">back to results</a>
-    `;
+    <input type="submit" id="submit-myreview" value="add watched movie" class="btn btn-outline-primary btn-md btn-block add"/>
+  </form>`;
+
+  const backButton = `<a href="#" class="btn btn-outline-dark btn-sm btn-back" onclick="showResultsView(state)"> back to results</a>`;
+
+  const markupHandler = `${isMovieStored(movieId) ? markupRemove : markupAdd}`;
+
+  div.innerHTML = markupInfo + markupHandler + backButton;
+
   mainView.appendChild(div);
 };
 
@@ -177,6 +201,8 @@ const showMovieView = async function (id) {
 const clearMainView = function () {
   mainView.innerHTML = "";
 };
+const navBarBrand = document.querySelector(".navbar-brand");
+navBarBrand.addEventListener("click", clearMainView);
 
 ///////////////////
 // MYMOVIES VIEW //
@@ -187,7 +213,7 @@ const clearMainView = function () {
 const btnAddMovie = document.querySelector(".mainView");
 btnAddMovie.addEventListener("click", function (e) {
   if (e.target.classList.contains("add")) {
-    MovieShelf.addMovies(state.movie);
+    MovieStorage.addMovies(state.movie);
   }
 });
 
@@ -196,7 +222,7 @@ btnAddMovie.addEventListener("click", function (e) {
 const btnRemoveMovie = document.querySelector(".mainView");
 btnRemoveMovie.addEventListener("click", function (e) {
   if (e.target.classList.contains("remove")) {
-    MovieShelf.removeMovies(state.movie.id);
+    MovieStorage.removeMovies(state.movie.id);
   }
 });
 
@@ -207,10 +233,10 @@ body.addEventListener("click", function (e) {
     clearMainView();
 
     // getting my-movies list from local storage
-    state.movieShelf = MovieShelf.getMovies();
+    state.movieStorage = MovieStorage.getMovies();
 
     // iterating over the list and displaying each item
-    state.movieShelf.forEach((movie) => {
+    state.movieStorage.forEach((movie) => {
       const div = document.createElement("div");
       div.className = "movie-item";
       div.innerHTML = `
@@ -231,37 +257,43 @@ body.addEventListener("click", function (e) {
 // LOCAL STORAGE //
 ///////////////////
 
-class MovieShelf {
+class MovieStorage {
   static getMovies() {
-    if (localStorage.getItem("state.movieShelf") === null) {
-      state.movieShelf = [];
+    if (localStorage.getItem("state.movieStorage") === null) {
+      state.movieStorage = [];
     } else {
-      state.movieShelf = JSON.parse(localStorage.getItem("state.movieShelf"));
-      /*   console.log("before foreach", state.movieShelf);
-      state.movieShelf.forEach((element) => {
-        new Movie(element);
-      });
-      console.log("after foreach", state.movieShelf);
-    */
+      state.movieStorage = JSON.parse(
+        localStorage.getItem("state.movieStorage")
+      );
     }
-    return state.movieShelf;
+    return state.movieStorage;
   }
 
   static addMovies(movie) {
-    const movieShelf = MovieShelf.getMovies();
-    movieShelf.push(movie);
-    localStorage.setItem("state.movieShelf", JSON.stringify(state.movieShelf));
+    const movieStorage = MovieStorage.getMovies();
+    movieStorage.push(movie);
+    localStorage.setItem(
+      "state.movieStorage",
+      JSON.stringify(state.movieStorage)
+    );
   }
 
   static removeMovies(id) {
-    const movieShelf = MovieShelf.getMovies();
+    const movieStorage = MovieStorage.getMovies();
 
-    movieShelf.forEach((movie, index) => {
+    movieStorage.forEach((movie, index) => {
       if (movie.id === id) {
-        movieShelf.splice(index, 1);
+        movieStorage.splice(index, 1);
       }
     });
 
-    localStorage.setItem("state.movieShelf", JSON.stringify(state.movieShelf));
+    localStorage.setItem(
+      "state.movieStorage",
+      JSON.stringify(state.movieStorage)
+    );
   }
 }
+
+/////////////////////
+// STORE MY REVIEW //
+/////////////////////
