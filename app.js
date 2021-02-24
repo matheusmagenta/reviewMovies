@@ -117,16 +117,26 @@ const showResultsView = function (state) {
 ////////////////////////////////
 // 2. USER CLICKS TO SEE MOVIE DETAILS
 
+// https://api.themoviedb.org/3/movie/{movie_id}?api_key=<<api_key>>&language=en-US
 // 2a. show data in the view
-const showMovieView = function (id) {
+const showMovieView = async function (id) {
   clearMainView();
-  // filter results with id of the movie clicked
-  const movie = state.search.results.filter(function (el) {
-    return el.id === id;
-  });
 
-  //update the state with the movie clicked
-  state.movie = movie[0];
+  let response = await fetch(
+    `${API_URL}movie/${id}?api_key=${apiKey}&language=en-US`
+  );
+  // console.log("response: ", response);
+  let dataResult = await response.json();
+  //console.log("dataResults: ", dataResult);
+
+  state.movie = new Movie(
+    dataResult.title,
+    dataResult.id,
+    dataResult.release_date,
+    dataResult.overview,
+    dataResult.poster_path,
+    dataResult.vote_average
+  );
 
   // show the movie clicked in the view
   const div = document.createElement("div");
@@ -182,7 +192,7 @@ btnAddMovie.addEventListener("click", function (e) {
 });
 
 // USER REMOVES MOVIE OF MYMOVIES LIST
-// removie movie of list mymovies with event propagation
+// remove movie of list mymovies with event propagation
 const btnRemoveMovie = document.querySelector(".mainView");
 btnRemoveMovie.addEventListener("click", function (e) {
   if (e.target.classList.contains("remove")) {
@@ -204,6 +214,9 @@ body.addEventListener("click", function (e) {
       const div = document.createElement("div");
       div.className = "movie-item";
       div.innerHTML = `
+      <img src="https://image.tmdb.org/t/p/w500/${
+        movie.poster_path
+      }" alt="movie-poster" class="movie-poster">
     <p class="movie-title">${movie.title}</p>
     <a onclick="showMovieView(${movie.id})" href="#">see details</a>
     <p class="movie-year">${movie.year.slice(0, 4)}</p>
@@ -224,6 +237,12 @@ class MovieShelf {
       state.movieShelf = [];
     } else {
       state.movieShelf = JSON.parse(localStorage.getItem("state.movieShelf"));
+      /*   console.log("before foreach", state.movieShelf);
+      state.movieShelf.forEach((element) => {
+        new Movie(element);
+      });
+      console.log("after foreach", state.movieShelf);
+    */
     }
     return state.movieShelf;
   }
