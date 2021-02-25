@@ -154,12 +154,12 @@ const showMovieView = async function (id) {
       return false;
     }
   };
-  isMovieStored(movieId);
 
   // show the movie clicked in the view
   const div = document.createElement("div");
   div.className = "movie-details";
 
+  // show movie info
   const markupInfo = `
   <img src="https://image.tmdb.org/t/p/w500/${
     state.movie.poster_path
@@ -171,26 +171,54 @@ const showMovieView = async function (id) {
     ${state.movie.overview}
     </p>`;
 
-  const markupRemove =
+  // show remove button
+  const removeButton =
     '<a href="#" class="btn btn-danger btn-sm remove">remove</a>';
 
-  const markupAdd = `
-  <a href="#" class="btn btn-outline-warning btn-md watch-later">watch later list</a>
-  <form>
+  // show add button, textarea to write review
+  const addButton =
+    '<a href="#" class="btn btn-outline-warning btn-md watch-later">watch later list</a>';
+
+  const markupReviewForm = `<form>
     <div class="form-group">
       <label for="myReview"></label>
       <textarea class="form-control" id="myReview" rows="3" placeholder="write my review"></textarea>
+      <input type="submit" id="submit-myreview" value="add watched movie" class="btn btn-outline-primary btn-md btn-block add-review"/>
     </div>
-    <input type="submit" id="submit-myreview" value="add watched movie" class="btn btn-outline-primary btn-md btn-block add"/>
   </form>`;
 
+  // show write review area or edit review
+  const markupReview = `${
+    isMovieStored(movieId)
+      ? `<div><p>${state.movieStorage[0].review}</p></div>`
+      : markupReviewForm
+  }`;
+
+  // back button
   const backButton = `<a href="#" class="btn btn-outline-dark btn-sm btn-back" onclick="showResultsView(state)"> back to results</a>`;
 
-  const markupHandler = `${isMovieStored(movieId) ? markupRemove : markupAdd}`;
+  // if movie is stored, show remove button. else, show add button.
+  const markupHandler = `${isMovieStored(movieId) ? removeButton : addButton}`;
 
-  div.innerHTML = markupInfo + markupHandler + backButton;
+  // show entire movie profil'
+  div.innerHTML = markupInfo + markupHandler + markupReview + backButton;
 
+  // show movie profile in the main view
   mainView.appendChild(div);
+};
+
+/////////////////////
+// STORE MY REVIEW //
+/////////////////////
+
+const storeMyReview = function (movie) {
+  // selecting textarea element
+  const textArea = document.querySelector("#myReview");
+
+  // storing in a variable the textarea value
+  const textAreaContent = textArea.value;
+
+  movie.review = textAreaContent;
 };
 
 ////////////////
@@ -201,6 +229,7 @@ const showMovieView = async function (id) {
 const clearMainView = function () {
   mainView.innerHTML = "";
 };
+// clean view clicking brand icon
 const navBarBrand = document.querySelector(".navbar-brand");
 navBarBrand.addEventListener("click", clearMainView);
 
@@ -208,11 +237,16 @@ navBarBrand.addEventListener("click", clearMainView);
 // MYMOVIES VIEW //
 ///////////////////
 
+/* document
+  .querySelector("#add-review")
+  .addEventListener("submit", storeMyReview(state.movie)); */
+
 // USER ADDS MOVIE TO MYMOVIES LIST
 // adding movie to list mymovies with event propagation
 const btnAddMovie = document.querySelector(".mainView");
 btnAddMovie.addEventListener("click", function (e) {
-  if (e.target.classList.contains("add")) {
+  if (e.target.classList.contains("add-review")) {
+    storeMyReview(state.movie);
     MovieStorage.addMovies(state.movie);
   }
 });
@@ -293,7 +327,3 @@ class MovieStorage {
     );
   }
 }
-
-/////////////////////
-// STORE MY REVIEW //
-/////////////////////
