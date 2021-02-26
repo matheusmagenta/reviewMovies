@@ -115,6 +115,42 @@ const showResultsView = function (state) {
   });
 };
 
+//////////////////////////////
+// CHECK IF MOVIE IS STORED //
+//////////////////////////////
+
+// check if the movie is already in the movieStorage
+const isMovieStored = function (dataResult) {
+  // compare id of movie on the view and ids in the storage
+  const compareMovieWithStorage = state.movieStorage.filter(
+    (movie) => movie.id === dataResult.id
+  );
+  if (compareMovieWithStorage.length > 0) {
+    console.log(
+      "movie already in the storage",
+      state.movieStorage.filter((movie) => movie.id === dataResult.id)[0]
+    );
+    return true;
+  } else {
+    console.log("movie is not in the storage", dataResult);
+
+    return false;
+  }
+};
+
+///////////////////////////////
+// CHECK IF MOVIE HAS REVIEW //
+///////////////////////////////
+const hasReview = function (movie) {
+  if (movie.review) {
+    console.log("has review");
+    return true;
+  } else {
+    console.log("has not review");
+    return false;
+  }
+};
+
 ////////////////////////////////
 // 2. USER CLICKS TO SEE MOVIE DETAILS
 
@@ -130,30 +166,20 @@ const showMovieView = async function (id) {
   let dataResult = await response.json();
   //console.log("dataResults: ", dataResult);
 
-  state.movie = new Movie(
-    dataResult.title,
-    dataResult.id,
-    dataResult.release_date,
-    dataResult.overview,
-    dataResult.poster_path,
-    dataResult.vote_average
-  );
-
-  const movieId = state.movie.id;
-  // check if the movie is already in the movieStorage
-  const isMovieStored = function () {
-    // compare id of movie on the view and ids in the storage
-    const checkMovieStored = state.movieStorage.filter(
-      (movie) => movie.id === dataResult.id
+  if (!isMovieStored(dataResult)) {
+    state.movie = new Movie(
+      dataResult.title,
+      dataResult.id,
+      dataResult.release_date,
+      dataResult.overview,
+      dataResult.poster_path,
+      dataResult.vote_average
     );
-    if (checkMovieStored.length > 0) {
-      console.log("movie already in the storage");
-      return true;
-    } else {
-      console.log("movie is not in the storage");
-      return false;
-    }
-  };
+  } else {
+    state.movie = state.movieStorage.filter(
+      (movie) => movie.id === dataResult.id
+    )[0];
+  }
 
   // show the movie clicked in the view
   const div = document.createElement("div");
@@ -171,9 +197,9 @@ const showMovieView = async function (id) {
     ${state.movie.overview}
     </p>`;
 
-  // show remove button
-  const removeButton =
-    '<a href="#" class="btn btn-danger btn-sm remove">remove</a>';
+  // show remove/edit buttons
+  const removeAndEditButton =
+    '<a href="#" class="btn btn-danger btn-sm remove">remove</a><a href="#" class="btn btn-warning btn-sm edit">edit</a>';
 
   // show add button, textarea to write review
   const addButton =
@@ -185,23 +211,22 @@ const showMovieView = async function (id) {
       <textarea class="form-control" id="myReview" rows="3" placeholder="write my review"></textarea>
       <input type="submit" id="submit-myreview" value="add watched movie" class="btn btn-outline-primary btn-md btn-block add-review"/>
     </div>
-  </form>`;
+  </form>
+  ${addButton}
+  `;
 
   // show write review area or edit review
   const markupReview = `${
-    isMovieStored(movieId)
-      ? `<div><p>${state.movieStorage[0].review}</p></div>`
+    hasReview(state.movie)
+      ? `${removeAndEditButton}<div id="myReview"><p>${state.movie.review}</p></div>`
       : markupReviewForm
   }`;
 
   // back button
   const backButton = `<a href="#" class="btn btn-outline-dark btn-sm btn-back" onclick="showResultsView(state)"> back to results</a>`;
 
-  // if movie is stored, show remove button. else, show add button.
-  const markupHandler = `${isMovieStored(movieId) ? removeButton : addButton}`;
-
   // show entire movie profil'
-  div.innerHTML = markupInfo + markupHandler + markupReview + backButton;
+  div.innerHTML = markupInfo + markupReview + backButton;
 
   // show movie profile in the main view
   mainView.appendChild(div);
@@ -211,35 +236,41 @@ const showMovieView = async function (id) {
 // STORE MY REVIEW //
 /////////////////////
 
-const storeMyReview = function (movie) {
-  // selecting textarea element
-  const textArea = document.querySelector("#myReview");
+// selecting textarea element
 
+const storeMyReview = function (movie) {
   // storing in a variable the textarea value
+  const textArea = document.querySelector("textarea");
   const textAreaContent = textArea.value;
 
   movie.review = textAreaContent;
 };
 
-////////////////
-// CLEAR VIEW //
-////////////////
+////////////////////
+// EDIT MY REVIEW //
+////////////////////
 
-// function to clear results
-const clearMainView = function () {
-  mainView.innerHTML = "";
+const editMyReview = function (movie) {
+  // selecting textarea element
+  const textArea = document.querySelector("#myReview");
+  const movieToBeEdited = state.movieStorage.filter(
+    (element) => element.id === movie.id
+  )[0];
+  const reviewToBeEdited = movieToBeEdited.review;
+  console.log("reviewToBeEdited: ", reviewToBeEdited);
+  // form with review's old version in the textarea
+  textArea.innerHTML = `<form>
+    <div class="form-group">
+      <label for="myReview"></label>
+      <textarea class="form-control" id="myReview" rows="3">${reviewToBeEdited}</textarea>
+      <input type="submit" id="submit-myreview" value="add watched movie" class="btn btn-outline-primary btn-md btn-block add-review"/>
+    </div>
+    </form>`;
 };
-// clean view clicking brand icon
-const navBarBrand = document.querySelector(".navbar-brand");
-navBarBrand.addEventListener("click", clearMainView);
 
 ///////////////////
 // MYMOVIES VIEW //
 ///////////////////
-
-/* document
-  .querySelector("#add-review")
-  .addEventListener("submit", storeMyReview(state.movie)); */
 
 // USER ADDS MOVIE TO MYMOVIES LIST
 // adding movie to list mymovies with event propagation
@@ -257,6 +288,14 @@ const btnRemoveMovie = document.querySelector(".mainView");
 btnRemoveMovie.addEventListener("click", function (e) {
   if (e.target.classList.contains("remove")) {
     MovieStorage.removeMovies(state.movie.id);
+  }
+});
+
+// USER EDIT MOVIE OF MYMOVIES LIST
+const btnEditMovie = document.querySelector(".mainView");
+btnEditMovie.addEventListener("click", function (e) {
+  if (e.target.classList.contains("edit")) {
+    editMyReview(state.movie);
   }
 });
 
@@ -303,15 +342,6 @@ class MovieStorage {
     return state.movieStorage;
   }
 
-  static addMovies(movie) {
-    const movieStorage = MovieStorage.getMovies();
-    movieStorage.push(movie);
-    localStorage.setItem(
-      "state.movieStorage",
-      JSON.stringify(state.movieStorage)
-    );
-  }
-
   static removeMovies(id) {
     const movieStorage = MovieStorage.getMovies();
 
@@ -326,4 +356,31 @@ class MovieStorage {
       JSON.stringify(state.movieStorage)
     );
   }
+
+  static addMovies(movie) {
+    const movieStorage = MovieStorage.getMovies();
+    console.log("movie added: ", movie);
+    movieStorage.forEach((element, index) => {
+      if (element.id === movie.id) {
+        movieStorage.splice(index, 1);
+      }
+    });
+    movieStorage.push(movie);
+    localStorage.setItem(
+      "state.movieStorage",
+      JSON.stringify(state.movieStorage)
+    );
+  }
 }
+
+////////////////
+// CLEAR VIEW //
+////////////////
+
+// function to clear results
+const clearMainView = function () {
+  mainView.innerHTML = "";
+};
+// clean view clicking brand icon
+const navBarBrand = document.querySelector(".navbar-brand");
+navBarBrand.addEventListener("click", clearMainView);
