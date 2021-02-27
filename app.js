@@ -102,13 +102,20 @@ const showResultsView = function (state) {
   state.search.results.map((movie) => {
     const div = document.createElement("div");
     div.className = "movie-item";
-    div.innerHTML = `
-  <img src="https://image.tmdb.org/t/p/w500/${
-    movie.poster_path
-  }" alt="movie-poster" class="movie-poster">
+    div.innerHTML = `${
+      movie.poster_path
+        ? `
+        <img
+          src="https://image.tmdb.org/t/p/w500/${movie.poster_path}"
+          alt="movie-poster"
+          class="movie-poster"
+        />
+      `
+        : `<img src="no-poster.jpg" alt="no poster image"/>`
+    }  
   <p class="movie-title">${movie.title}</p>
   <a onclick="showMovieView(${movie.id})" href="#">see details</a>
-  <p class="movie-year">${movie.year.slice(0, 4)}</p>
+  ${movie.year ? `<p class="movie-year">${movie.year.slice(0, 4)}</p>` : ""}
   <p class="vote-average">${movie.vote_average}</p>
   `;
     mainView.appendChild(div);
@@ -186,7 +193,29 @@ const showMovieView = async function (id) {
   div.className = "movie-details";
 
   // show movie info
-  const markupInfo = `
+  const markupInfo = `${
+    state.movie.poster_path
+      ? `
+      <img
+        src="https://image.tmdb.org/t/p/w500/${state.movie.poster_path}"
+        alt="movie-poster"
+        class="movie-poster"
+      />
+    `
+      : `<img src="no-poster.jpg" alt="no poster image"/>`
+  }  
+    <p class="movie-title">${state.movie.title}</p>
+    ${
+      state.movie.year
+        ? `<p class="movie-year">${state.movie.year.slice(0, 4)}</p>`
+        : ""
+    } 
+    <p class="vote-average">${state.movie.vote_average}</p>
+    <p class="overview">
+    ${state.movie.overview}
+    </p>`;
+
+  /*  const markupInfo = `  
   <img src="https://image.tmdb.org/t/p/w500/${
     state.movie.poster_path
   }" alt="movie-poster" class="movie-poster">
@@ -195,24 +224,24 @@ const showMovieView = async function (id) {
     <p class="vote-average">${state.movie.vote_average}</p>
     <p class="overview">
     ${state.movie.overview}
-    </p>`;
+    </p>`; */
 
   // show remove/edit buttons
   const removeAndEditButton =
     '<a href="#" class="btn btn-danger btn-sm remove">remove</a><a href="#" class="btn btn-warning btn-sm edit">edit</a>';
 
-  // show add button, textarea to write review
-  const addButton =
+  // show save button, textarea to write review
+  const saveButton =
     '<a href="#" class="btn btn-outline-warning btn-md watch-later">watch later list</a>';
 
   const markupReviewForm = `<form>
     <div class="form-group">
       <label for="myReview"></label>
       <textarea class="form-control" id="myReview" rows="3" placeholder="write my review"></textarea>
-      <input type="submit" id="submit-myreview" value="add watched movie" class="btn btn-outline-primary btn-md btn-block add-review"/>
+      <input type="submit" id="submit-myreview" value="save watched movie" class="btn btn-outline-primary btn-md btn-block save-review"/>
     </div>
   </form>
-  ${addButton}
+  ${saveButton}
   `;
 
   // show write review area or edit review
@@ -263,7 +292,7 @@ const editMyReview = function (movie) {
     <div class="form-group">
       <label for="myReview"></label>
       <textarea class="form-control" id="myReview" rows="3">${reviewToBeEdited}</textarea>
-      <input type="submit" id="submit-myreview" value="add watched movie" class="btn btn-outline-primary btn-md btn-block add-review"/>
+      <input type="submit" id="submit-myreview" value="save watched movie" class="btn btn-outline-primary btn-md btn-block save-review"/>
     </div>
     </form>`;
 };
@@ -274,11 +303,11 @@ const editMyReview = function (movie) {
 
 // USER ADDS MOVIE TO MYMOVIES LIST
 // adding movie to list mymovies with event propagation
-const btnAddMovie = document.querySelector(".mainView");
-btnAddMovie.addEventListener("click", function (e) {
-  if (e.target.classList.contains("add-review")) {
+const btnSaveMovie = document.querySelector(".mainView");
+btnSaveMovie.addEventListener("click", function (e) {
+  if (e.target.classList.contains("save-review")) {
     storeMyReview(state.movie);
-    MovieStorage.addMovies(state.movie);
+    MovieStorage.saveMovies(state.movie);
   }
 });
 
@@ -312,13 +341,20 @@ body.addEventListener("click", function (e) {
     state.movieStorage.forEach((movie) => {
       const div = document.createElement("div");
       div.className = "movie-item";
-      div.innerHTML = `
-      <img src="https://image.tmdb.org/t/p/w500/${
-        movie.poster_path
-      }" alt="movie-poster" class="movie-poster">
+      div.innerHTML = `${
+        state.movie.poster_path
+          ? `
+          <img
+            src="https://image.tmdb.org/t/p/w500/${state.movie.poster_path}"
+            alt="movie-poster"
+            class="movie-poster"
+          />
+        `
+          : `<img src="no-poster.jpg" alt="no poster image"/>`
+      }  
     <p class="movie-title">${movie.title}</p>
     <a onclick="showMovieView(${movie.id})" href="#">see details</a>
-    <p class="movie-year">${movie.year.slice(0, 4)}</p>
+    ${movie.year ? `<p class="movie-year">${movie.year.slice(0, 4)}</p>` : ""}
     <p class="vote-average">${movie.vote_average}</p>
     `;
       mainView.appendChild(div);
@@ -357,9 +393,9 @@ class MovieStorage {
     );
   }
 
-  static addMovies(movie) {
+  static saveMovies(movie) {
     const movieStorage = MovieStorage.getMovies();
-    console.log("movie added: ", movie);
+    console.log("movie saved: ", movie);
     movieStorage.forEach((element, index) => {
       if (element.id === movie.id) {
         movieStorage.splice(index, 1);
