@@ -20,6 +20,10 @@ const state = {
   search: {
     querySearch: "",
     results: [],
+    resultsPerPage: 20,
+    currentPage: 0,
+    totalPages: 0,
+    totalResults: 0,
   },
   movieStorage: [],
 };
@@ -44,6 +48,7 @@ class Movie {
 // selecting elements from the DOM
 const mainView = document.querySelector(".mainView");
 const body = document.querySelector("body");
+const searchHeader = document.querySelector(".searchHeader");
 
 //////////////////////////////////
 // FUNCTIONS
@@ -68,16 +73,23 @@ inputSearch.addEventListener("submit", (e) => {
 });
 
 // 1b. using the keyword, get results from api search
-const loadResults = async function (querySearch) {
+const loadResults = async function (querySearch, currentPage = 1) {
   state.search.querySearch = querySearch;
   state.search.results = []; //clear other results
   let response = await fetch(
-    `${API_URL}search/movie?api_key=${apiKey}&query=${state.search.querySearch}`
+    `${API_URL}search/movie?api_key=${apiKey}&query=${state.search.querySearch}&page=${currentPage}`
   );
+
   // console.log("response: ", response);
   let dataResults = await response.json();
   //console.log("results: ", dataResults.results);
 
+  // storing current page, total of results and pages from result search
+  state.search.currentPage = dataResults.page;
+  state.search.totalPages = dataResults.total_pages;
+  state.search.totalResults = dataResults.total_results;
+
+  // storing movies to be shown
   dataResults.results.forEach((result) => {
     //console.log(result);
     state.search.results.push(
@@ -87,7 +99,8 @@ const loadResults = async function (querySearch) {
         result.release_date,
         result.overview,
         result.poster_path,
-        result.vote_average
+        result.vote_average,
+        result.page
       )
     );
   });
@@ -99,6 +112,16 @@ const showResultsView = function (state) {
   clearMainView();
   // parentElement = document.querySelector(".body");
 
+  // search header with current page, total pages and total results
+  const dataSearch = document.createElement("div");
+  dataSearch.className = "search-header";
+  dataSearch.innerHTML = `
+  your search found ${state.search.totalResults} movies |
+  showing page #${state.search.currentPage} of ${state.search.totalPages}
+  `;
+  mainView.appendChild(dataSearch);
+
+  // showing 20 results from current search page
   state.search.results.map((movie) => {
     const div = document.createElement("div");
     div.className = "movie-item";
@@ -120,7 +143,68 @@ const showResultsView = function (state) {
   `;
     mainView.appendChild(div);
   });
+
+  // showing pagination
+  const pagination = document.createElement("div");
+  pagination.className = "pagination";
+  pagination.innerHTML = createPaginationButtons(state);
+  mainView.appendChild(pagination);
 };
+
+////////////////
+// PAGINATION //
+////////////////
+const createPaginationButtons = function (state) {
+  // first page and there are more pages
+  if (state.search.currentPage === 1 && state.search.totalPages > 1) {
+    return `<button data-goto="${
+      state.search.currentPage + 1
+    }" class="btn--inline pagination__btn--next">
+      <span>go to page ${state.search.currentPage + 1}</span>
+    </button>`;
+  }
+  // last page
+  if (state.search.currentPage === state.search.totalPages) {
+    return `<button data-goto="${
+      state.search.currentPage - 1
+    }" class="btn--inline pagination__btn--prev">
+    <span>go to page ${state.search.currentPage - 1}</span>
+  </button>`;
+  }
+  // other page
+  if (
+    state.search.currentPage !== 1 &&
+    state.search.currentPage !== state.search.totalPages
+  ) {
+    return `
+  <button data-goto="${
+    state.search.currentPage - 1
+  }" class="btn--inline pagination__btn--prev">
+    <span>go to page ${state.search.currentPage - 1}</span>
+  </button>
+  <button data-goto="${
+    state.search.currentPage + 1
+  }" class="btn--inline pagination__btn--next">
+  <span>go to page ${state.search.currentPage + 1}</span>
+</button>`;
+  }
+
+  // single page
+  return "";
+};
+
+// adding handler click
+// function addHandlerClick(loadResults) {
+mainView.addEventListener("click", function (e) {
+  const btn = e.target.closest(".btn--inline");
+  if (!btn) return;
+
+  const goToPage = +btn.dataset.goto;
+  console.log(goToPage);
+
+  loadResults(state.search.querySearch, goToPage);
+});
+//}
 
 //////////////////////////////
 // CHECK IF MOVIE IS STORED //
@@ -313,6 +397,7 @@ btnSaveMovie.addEventListener("click", function (e) {
 
 // USER REMOVES MOVIE OF MYMOVIES LIST
 // remove movie of list mymovies with event propagation
+// !!!!!!!!! NEED TO BE REFACTOR !!!!!!!!!!! TARGETING THE SAME ELEMENT
 const btnRemoveMovie = document.querySelector(".mainView");
 btnRemoveMovie.addEventListener("click", function (e) {
   if (e.target.classList.contains("remove")) {
@@ -321,6 +406,7 @@ btnRemoveMovie.addEventListener("click", function (e) {
 });
 
 // USER EDIT MOVIE OF MYMOVIES LIST
+// !!!!!!!!! NEED TO BE REFACTOR !!!!!!!!!!! TARGETING THE SAME ELEMENT
 const btnEditMovie = document.querySelector(".mainView");
 btnEditMovie.addEventListener("click", function (e) {
   if (e.target.classList.contains("edit")) {
@@ -342,10 +428,10 @@ body.addEventListener("click", function (e) {
       const div = document.createElement("div");
       div.className = "movie-item";
       div.innerHTML = `${
-        state.movie.poster_path
+        movie.poster_path
           ? `
           <img
-            src="https://image.tmdb.org/t/p/w500/${state.movie.poster_path}"
+            src="https://image.tmdb.org/t/p/w500/${movie.poster_path}"
             alt="movie-poster"
             class="movie-poster"
           />
