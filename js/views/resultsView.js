@@ -3,19 +3,17 @@ import View from "./View.js";
 class ResultsView extends View {
   _parentElement = document.querySelector(".results");
 
-  //clearMainView()
-
   addHandlerClick(handler) {
     this._parentElement.addEventListener("click", function (e) {
       if (e.target.classList.contains("movie-details")) {
-        console.log(e.target.dataset.id);
+        //console.log(e.target.dataset.id);
         handler(e.target.dataset.id);
       }
     });
   }
 
   _generateMarkup() {
-    console.log(this._data);
+    //console.log(this._data);
     const resultsList = [];
     this._data.map((result) => {
       // showing results from current search page
@@ -37,11 +35,12 @@ class ResultsView extends View {
     ${result.year ? `<p class="movie-year">${result.year.slice(0, 4)}</p>` : ""}
     <p class="vote-average">${result.vote_average}</p>
     `;
+
       resultsList.push(div);
     });
+    //console.log(resultsList);
     return resultsList.map((movie) => movie.outerHTML);
   }
-  // <a onclick="controlMovies(${result.id})" href="#">see details</a>
 
   // search header with current page, total pages and total results
   /*  _generateHeader() {

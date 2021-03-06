@@ -39,7 +39,7 @@ export const state = {
 export const loadMovie = async function (id) {
   try {
     // getting the data from api
-    console.log("loadMovie argument:", id);
+    //console.log("loadMovie argument:", id);
     const dataResult = await getJSON(
       `${API_URL}movie/${id}?api_key=${API_KEY}&language=en-US`
     );
@@ -111,8 +111,11 @@ export const loadSearchResults = async function (query, currentPage = 1) {
 //////////////////////////////
 
 // check if the movie is already in the movieStorage
-const isMovieStored = function (dataResult) {
+export const isMovieStored = function (dataResult) {
   // compare id of movie on the view and ids in the storage
+  state.movieStorage = JSON.parse(
+    localStorage.getItem("model.state.movieStorage")
+  );
   const compareMovieWithStorage = state.movieStorage.filter(
     (movie) => movie.id === dataResult.id
   );
@@ -125,19 +128,6 @@ const isMovieStored = function (dataResult) {
   } else {
     console.log("movie is not in the storage", dataResult);
 
-    return false;
-  }
-};
-
-///////////////////////////////
-// CHECK IF MOVIE HAS REVIEW //
-///////////////////////////////
-const hasReview = function (movie) {
-  if (movie.review) {
-    console.log("has review");
-    return true;
-  } else {
-    console.log("has not review");
     return false;
   }
 };

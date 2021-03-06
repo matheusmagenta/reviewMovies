@@ -3,6 +3,7 @@ import movieView from "./views/movieView.js";
 import searchView from "./views/searchView.js";
 import { API_URL, API_KEY } from "./config.js";
 import resultsView from "./views/resultsView.js";
+import myMoviesView from "./views/myMoviesView.js";
 
 // example of api request with my api_key
 // https://api.themoviedb.org/3/movie/550?api_key=21545d3f8c898a2b27bafd3db0854b12
@@ -10,38 +11,19 @@ import resultsView from "./views/resultsView.js";
 // reference fetch
 // https://javascript.info/fetch
 
-const id = "";
-
 // selecting elements from the DOM
 const mainView = document.querySelector(".mainView");
 const body = document.querySelector("body");
 const searchHeader = document.querySelector(".searchHeader");
-
-// adding handler click
-// function addHandlerClick(loadSearchResults) {
-/* mainView.addEventListener("click", function (e) {
-  const btn = e.target.closest(".btn--inline");
-  if (!btn) return;
-
-  const goToPage = +btn.dataset.goto;
-  console.log(goToPage);
-
-  model.loadSearchResults(state.search.querySearch, goToPage);
-}); */
-//}
 
 ///////////////////////////////////
 // REFACTORING CONTROLLER
 //////////////////////////////////
 
 // CONTROLLER - USER CLICKS TO SEE MOVIE DETAILS
-// https://api.themoviedb.org/3/movie/{movie_id}?api_key=<<api_key>>&language=en-US
-// 2a. show data in the view
 const controlMovies = async function (id) {
   try {
-    // clearMainView();
-
-    // get movie clicked id
+    clearMainView();
 
     // 1) loading movie
     await model.loadMovie(id);
@@ -70,6 +52,82 @@ const controlSearchResults = async function () {
   }
 };
 
+////////////////////////
+// MYMOVIES LIST //
+////////////////////////
+
+// SHOW MYMOVIES LIST - BUTTON TOP NAVBAR
+// NEED TO BE REFACTORED AS FUNCTION
+body.addEventListener("click", function (e) {
+  if (e.target.classList.contains("my-movies")) {
+    // getting my-movies list from local storage
+    model.state.movieStorage = MovieStorage.getMovies();
+
+    // showing mymovies list
+    myMoviesView.render(model.state.movieStorage);
+  }
+});
+
+// REMOVE MOVIE OF MYMOVIES LIST
+// remove movie of list mymovies with event propagation
+mainView.addEventListener("click", function (e) {
+  if (e.target.classList.contains("remove")) {
+    MovieStorage.removeMovies(model.state.movie.id);
+  }
+});
+
+// EDIT/UPDATE REVIEW MYMOVIE
+const editMyReview = function (movie) {
+  // selecting textarea element
+  const textArea = document.querySelector("#myReview");
+  const movieToBeEdited = model.state.movieStorage.filter(
+    (element) => element.id === movie.id
+  )[0];
+  const reviewToBeEdited = movieToBeEdited.review;
+  console.log("reviewToBeEdited: ", reviewToBeEdited);
+  // form with review's old version in the textarea
+  textArea.innerHTML = `<form>
+      <div class="form-group">
+        <label for="myReview"></label>
+        <textarea class="form-control" id="myReview" rows="3">${reviewToBeEdited}</textarea>
+      </div>
+      </form>
+      `;
+};
+
+// EDIT MOVIE OF MYMOVIES LIST
+document.addEventListener("click", function (e) {
+  if (e.target.classList.contains("edit")) {
+    editMyReview(model.state.movie);
+  }
+});
+
+//////////////////////////////
+// STORING IN MYMOVIES LIST //
+//////////////////////////////
+
+// USER ADDS MOVIE TO MYMOVIES LIST + REVIEW
+document.addEventListener("click", function (e) {
+  if (e.target.classList.contains("save-movie")) {
+    // getting written review
+    let review = document.querySelector("#myReview.form-control").value;
+
+    //let review = document.querySelector("#myReview").value;
+    console.log("review: ", review);
+
+    // check if user wrote review. if not, insert msg
+    if (review === "") review = "movie saved without review";
+
+    // update state with review
+    model.state.movie.review = review;
+
+    console.log("review to be stored: ", model.state.movie.review);
+
+    // store movie+review in LocalStorage
+    MovieStorage.saveMovies(model.state.movie);
+  }
+});
+
 //////////
 // INIT //
 //////////
@@ -77,5 +135,69 @@ const init = function () {
   movieView.addHandlerRender(controlMovies);
   searchView.addHandlerSearch(controlSearchResults);
   resultsView.addHandlerClick(controlMovies);
+  myMoviesView.addHandlerClick(controlMovies);
 };
 init();
+
+///////////////////
+// LOCAL STORAGE //
+///////////////////
+
+class MovieStorage {
+  static getMovies() {
+    if (localStorage.getItem("model.state.movieStorage") === null) {
+      model.state.movieStorage = [];
+    } else {
+      model.state.movieStorage = JSON.parse(
+        localStorage.getItem("model.state.movieStorage")
+      );
+    }
+    return model.state.movieStorage;
+  }
+
+  static removeMovies(id) {
+    const movieStorage = MovieStorage.getMovies();
+
+    movieStorage.forEach((movie, index) => {
+      if (movie.id === id) {
+        movieStorage.splice(index, 1);
+      }
+    });
+
+    localStorage.setItem(
+      "model.state.movieStorage",
+      JSON.stringify(model.state.movieStorage)
+    );
+    console.log("current state movieStorage: ", model.state.movieStorage);
+  }
+
+  static saveMovies(movie) {
+    const movieStorage = MovieStorage.getMovies();
+    console.log("movie saved: ", movie);
+    console.log("movieStorage", movieStorage);
+    movieStorage.forEach((element, index) => {
+      if (element.id == movie.id) {
+        console.log("movie already in storage!!");
+        movieStorage.splice(index, 1);
+      }
+    });
+    movieStorage.push(movie);
+    localStorage.setItem(
+      "model.state.movieStorage",
+      JSON.stringify(model.state.movieStorage)
+    );
+    console.log("current state movieStorage: ", model.state.movieStorage);
+  }
+}
+
+////////////////
+// CLEAR VIEW //
+////////////////
+
+// function to clear results
+const clearMainView = function () {
+  mainView.innerHTML = "";
+};
+// clean view clicking brand icon
+const navBarBrand = document.querySelector(".navbar-brand");
+navBarBrand.addEventListener("click", clearMainView);
