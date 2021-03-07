@@ -62,8 +62,8 @@ class MovieView extends View {
 
     // show entire movie profile
     div.innerHTML = markupInfo + markupReview + backButton;
-    // console.log("div: ", div);
-    return div.innerHTML;
+    console.log("div: ", div);
+    return div;
   }
 
   // check if the movie has review

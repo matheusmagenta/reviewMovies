@@ -23,7 +23,7 @@ const searchHeader = document.querySelector(".searchHeader");
 // CONTROLLER - USER CLICKS TO SEE MOVIE DETAILS
 const controlMovies = async function (id) {
   try {
-    clearMainView();
+    //clearMainView();
 
     // 1) loading movie
     await model.loadMovie(id);
@@ -41,23 +41,25 @@ const controlSearchResults = async function () {
     // 1. get search query
     const query = searchView.getQuery();
     if (!query) return; // without query, guard clause return immediately
-
+    model.state.search.query = query;
+    console.log(model.state);
     // 2. load search results
     await model.loadSearchResults(query);
 
     // 3. render search results
-    resultsView.render(model.state.search.results);
+    //resultsView.render(model.state.search.results);
+    resultsView.render(model.state.search);
   } catch (err) {
     console.log(err);
   }
 };
 
-////////////////////////
+///////////////////
 // MYMOVIES LIST //
-////////////////////////
+///////////////////
 
 // SHOW MYMOVIES LIST - BUTTON TOP NAVBAR
-// NEED TO BE REFACTORED AS FUNCTION
+// NEED TO BE REFACTORED AS FUNCTION OR CLASS
 body.addEventListener("click", function (e) {
   if (e.target.classList.contains("my-movies")) {
     // getting my-movies list from local storage
@@ -70,7 +72,7 @@ body.addEventListener("click", function (e) {
 
 // REMOVE MOVIE OF MYMOVIES LIST
 // remove movie of list mymovies with event propagation
-mainView.addEventListener("click", function (e) {
+body.addEventListener("click", function (e) {
   if (e.target.classList.contains("remove")) {
     MovieStorage.removeMovies(model.state.movie.id);
   }
@@ -96,7 +98,7 @@ const editMyReview = function (movie) {
 };
 
 // EDIT MOVIE OF MYMOVIES LIST
-document.addEventListener("click", function (e) {
+body.addEventListener("click", function (e) {
   if (e.target.classList.contains("edit")) {
     editMyReview(model.state.movie);
   }
@@ -125,6 +127,9 @@ document.addEventListener("click", function (e) {
 
     // store movie+review in LocalStorage
     MovieStorage.saveMovies(model.state.movie);
+
+    // clear page
+    //clearMainView();
   }
 });
 
@@ -134,7 +139,7 @@ document.addEventListener("click", function (e) {
 const init = function () {
   movieView.addHandlerRender(controlMovies);
   searchView.addHandlerSearch(controlSearchResults);
-  resultsView.addHandlerClick(controlMovies);
+  resultsView.addHandlerClick(controlSearchResults);
   myMoviesView.addHandlerClick(controlMovies);
 };
 init();
@@ -196,8 +201,32 @@ class MovieStorage {
 
 // function to clear results
 const clearMainView = function () {
-  mainView.innerHTML = "";
+  if (document.querySelector(".results"))
+    document.querySelector(".results").innerHTML = "";
+  if (document.querySelector(".movie-details"))
+    document.querySelector(".movie-details").innerHTML = "";
 };
 // clean view clicking brand icon
 const navBarBrand = document.querySelector(".navbar-brand");
 navBarBrand.addEventListener("click", clearMainView);
+
+////////////////
+// PAGINATION //
+////////////////
+
+mainView.addEventListener("click", async function (e) {
+  // selecting button
+  const btn = e.target.closest(".btn--inline");
+  if (!btn) return;
+
+  // getting number page
+  const goToPage = +btn.dataset.goto;
+  // console.log("goToPage: ", goToPage);
+  // console.log("model.state.search.query: ", model.state.search.query);
+
+  // getting search results data from that page
+  await model.loadSearchResults(model.state.search.query, goToPage);
+
+  // send search results data to view
+  resultsView.render(model.state.search);
+});

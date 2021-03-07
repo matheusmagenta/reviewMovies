@@ -1,7 +1,7 @@
 import View from "./View.js";
 
 class MyMoviesView extends View {
-  _parentElement = document.querySelector(".mainView");
+  _parentElement = document.querySelector(".results");
 
   addHandlerClick(handler) {
     this._parentElement.addEventListener("click", function (e) {
@@ -23,7 +23,7 @@ class MyMoviesView extends View {
   _generateMarkup() {
     //console.log(this._data);
     const myMoviesList = [];
-    this._data.map((result) => {
+    this._data.forEach((result) => {
       // showing results from myMovies list
       const div = document.createElement("div");
       div.className = `movie-item data-id=${result.id}`;
@@ -49,8 +49,7 @@ class MyMoviesView extends View {
       `;
       myMoviesList.push(div);
     });
-    //console.log(myMoviesList);
-    return myMoviesList.map((movie) => movie.outerHTML);
+    return myMoviesList;
   }
 }
 

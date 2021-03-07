@@ -43,7 +43,7 @@ export const loadMovie = async function (id) {
     const dataResult = await getJSON(
       `${API_URL}movie/${id}?api_key=${API_KEY}&language=en-US`
     );
-    console.log("dataResult: ", dataResult);
+    //    console.log("dataResult: ", dataResult);
 
     if (!isMovieStored(dataResult)) {
       state.movie = new Movie(
@@ -112,13 +112,14 @@ export const loadSearchResults = async function (query, currentPage = 1) {
 
 // check if the movie is already in the movieStorage
 export const isMovieStored = function (dataResult) {
+  //console.log("dataResult in isMovieStored()", dataResult);
   // compare id of movie on the view and ids in the storage
-  if (!state.movieStorage) {
-    state.movieStorage = [];
-  } else {
+
+  if (state.movieStorage.length > 0) {
     state.movieStorage = JSON.parse(
       localStorage.getItem("model.state.movieStorage")
     );
+    //  console.log("state.movieStorage: ", state.movieStorage);
     const compareMovieWithStorage = state.movieStorage.filter(
       (movie) => movie.id === dataResult.id
     );
@@ -133,5 +134,10 @@ export const isMovieStored = function (dataResult) {
 
       return false;
     }
+  }
+  if (!state.movieStorage) {
+    state.movieStorage = [];
+    //    console.log("state.movieStorage: ", state.movieStorage);
+    return false;
   }
 };

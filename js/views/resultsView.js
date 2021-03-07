@@ -15,7 +15,7 @@ class ResultsView extends View {
   _generateMarkup() {
     //console.log(this._data);
     const resultsList = [];
-    this._data.map((result) => {
+    this._data.results.map((result) => {
       // showing results from current search page
       const div = document.createElement("div");
       div.className = `movie-item data-id=${result.id}`;
@@ -38,18 +38,61 @@ class ResultsView extends View {
 
       resultsList.push(div);
     });
-    //console.log(resultsList);
-    return resultsList.map((movie) => movie.outerHTML);
+    return resultsList;
   }
 
   // search header with current page, total pages and total results
-  /*  _generateHeader() {
+  _generateSearchHeader() {
+    //console.log("search:", search);
     const dataSearch = document.createElement("div");
     dataSearch.className = "search-header";
-    dataSearch.innerHTML = `your search found ${state.search.totalResults} movies |
-        showing page #${state.search.currentPage} of ${state.search.totalPages}`;
-    mainView.appendChild(dataSearch);
-  } */
+    dataSearch.innerHTML = `your search found ${this._data.totalResults} movies |
+        showing page #${this._data.currentPage} of ${this._data.totalPages}`;
+    return dataSearch;
+  }
+
+  _generatePagination() {
+    const pagination = document.createElement("div");
+    pagination.className = "search-pagination";
+    if (this._data.currentPage === 1 && this._data.totalPages > 1) {
+      pagination.innerHTML = `<button data-goto="${
+        this._data.currentPage + 1
+      }" class="btn--inline pagination__btn--next">
+            <span>go to page ${this._data.currentPage + 1}</span>
+          </button>`;
+      return pagination;
+    }
+    // last page
+    if (this._data.currentPage === this._data.totalPages) {
+      pagination.innerHTML = `<button data-goto="${
+        this._data.currentPage - 1
+      }" class="btn--inline pagination__btn--prev">
+          <span>go to page ${this._data.currentPage - 1}</span>
+        </button>`;
+      return pagination;
+    }
+    // other page
+    if (
+      this._data.currentPage !== 1 &&
+      this._data.currentPage !== this._data.totalPages
+    ) {
+      pagination.innerHTML = `
+        <button data-goto="${
+          this._data.currentPage - 1
+        }" class="btn--inline pagination__btn--prev">
+          <span>go to page ${this._data.currentPage - 1}</span>
+        </button>
+        <button data-goto="${
+          this._data.currentPage + 1
+        }" class="btn--inline pagination__btn--next">
+        <span>go to page ${this._data.currentPage + 1}</span>
+      </button>`;
+      return pagination;
+    }
+
+    // single page
+    return "";
+  }
 }
 
 export default new ResultsView();

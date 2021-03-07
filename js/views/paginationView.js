@@ -3,7 +3,7 @@
 ////////////////
 // PAGINATION //
 ////////////////
-const createPaginationButtons = function (state) {
+export const createPaginationButtons = function (state) {
   // first page and there are more pages
   if (state.search.currentPage === 1 && state.search.totalPages > 1) {
     return `<button data-goto="${

@@ -4,14 +4,23 @@ export default class View {
   render(data) {
     // receiving data from model via controller
     this._data = data;
+    //console.log("this._data: ", this._data);
+
     // gets markup generated below in this class with the data above
     const markup = this._generateMarkup();
-    //console.log("markup: ", markup);
+    // console.log("markup: ", markup);
     // clear the page
-    this._clear();
-    // show movie profile in the main view
-    //console.log(this._parentElement);
-    this._parentElement.insertAdjacentHTML("beforeend", markup);
+    this._clear(); // console.log("this._parentElement: ", this._parentElement);
+
+    // check if this._data is search results
+    if (this._data.results) {
+      this._parentElement.appendChild(this._generateSearchHeader());
+      this._parentElement.appendChild(this._generatePagination());
+    }
+
+    Array.isArray(markup)
+      ? markup.forEach((item) => this._parentElement.appendChild(item))
+      : this._parentElement.appendChild(markup);
   }
 
   _clear() {
