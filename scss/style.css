@@ -1,0 +1,32 @@
+.container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.results {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  height: 1200px;
+  width: 800px;
+}
+
+/* flex items */
+.movie-item {
+  text-align: center;
+  width: 200px;
+  border: 1px solid black;
+  margin: 10px;
+}
+
+.movie-poster {
+  width: 150px;
+  height: 190px;
+}
+/*# sourceMappingURL=style.css.map */
