@@ -20,6 +20,11 @@ body {
   font-family: "Orelega", sans-serif;
 }
 
+movie.poster {
+  -webkit-transform: scale(0.7);
+          transform: scale(0.7);
+}
+
 #movie-search {
   width: 150px;
 }
@@ -114,6 +119,12 @@ body {
 .movie-title {
   margin: 0;
   padding: 0;
+}
+
+.btn-light {
+  color: white;
+  background-color: #2e2236;
+  border: none;
 }
 
 .movie-title {

@@ -6,18 +6,18 @@
 export const createPaginationButtons = function (state) {
   // first page and there are more pages
   if (state.search.currentPage === 1 && state.search.totalPages > 1) {
-    return `<button data-goto="${
+    return `<button btn-light data-goto="${
       state.search.currentPage + 1
-    }" class="btn--inline pagination__btn--next">
-          <span>go to page ${state.search.currentPage + 1}</span>
+    }" class="btn--inline btn-light pagination__btn--next">
+          <span>page ${state.search.currentPage + 1}</span>
         </button>`;
   }
   // last page
   if (state.search.currentPage === state.search.totalPages) {
-    return `<button data-goto="${
+    return `<button btn-light data-goto="${
       state.search.currentPage - 1
-    }" class="btn--inline pagination__btn--prev">
-        <span>go to page ${state.search.currentPage - 1}</span>
+    }" class="btn--inline btn-light pagination__btn--prev">
+        <span>page ${state.search.currentPage - 1}</span>
       </button>`;
   }
   // other page
@@ -26,15 +26,15 @@ export const createPaginationButtons = function (state) {
     state.search.currentPage !== state.search.totalPages
   ) {
     return `
-      <button data-goto="${
+      <button btn-light data-goto="${
         state.search.currentPage - 1
       }" class="btn--inline pagination__btn--prev">
-        <span>go to page ${state.search.currentPage - 1}</span>
+        <span>page ${state.search.currentPage - 1}</span>
       </button>
-      <button data-goto="${
+      <button btn-light data-goto="${
         state.search.currentPage + 1
       }" class="btn--inline pagination__btn--next">
-      <span>go to page ${state.search.currentPage + 1}</span>
+      <span>page ${state.search.currentPage + 1}</span>
     </button>`;
   }
 

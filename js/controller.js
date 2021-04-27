@@ -23,8 +23,9 @@ const searchHeader = document.querySelector(".searchHeader");
 // CONTROLLER - USER CLICKS TO SEE MOVIE DETAILS
 const controlMovies = async function (id) {
   try {
+    //console.log("hello");
     // clear view
-    clearMainView();
+    //clearMainView();
 
     // 1) loading movie
     await model.loadMovie(id);
@@ -46,7 +47,7 @@ const controlSearchResults = async function () {
     const query = searchView.getQuery();
     if (!query) return; // without query, guard clause return immediately
     model.state.search.query = query;
-    console.log(model.state);
+    // console.log(model.state);
     // 2. load search results
     await model.loadSearchResults(query);
 
@@ -68,6 +69,9 @@ body.addEventListener("click", function (e) {
   if (e.target.classList.contains("my-movies")) {
     // getting my-movies list from local storage
     model.state.movieStorage = MovieStorage.getMovies();
+
+    // clear view
+    clearMainView();
 
     // showing mymovies list
     myMoviesView.render(model.state.movieStorage);

@@ -6,7 +6,8 @@ class MyMoviesView extends View {
   addHandlerClick(handler) {
     this._parentElement.addEventListener("click", function (e) {
       if (e.target.classList.contains("movie-details")) {
-        //console.log(e.target.dataset.id);
+        console.log("e.target", e.target);
+        console.log("e.target.dataset.id:", e.target.dataset.id);
         handler(e.target.dataset.id);
       }
     });
@@ -26,7 +27,8 @@ class MyMoviesView extends View {
     this._data.forEach((result) => {
       // showing results from myMovies list
       const div = document.createElement("div");
-      div.className = `movie-item data-id=${result.id}`;
+      div.className = "movie-item";
+      div.dataset.id = result.id;
       div.innerHTML = `${
         result.poster_path
           ? `

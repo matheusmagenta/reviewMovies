@@ -6,7 +6,7 @@ class ResultsView extends View {
   addHandlerClick(handler) {
     this._parentElement.addEventListener("click", function (e) {
       if (e.target.classList.contains("movie-details")) {
-        //console.log(e.target.dataset.id);
+        console.log(e.target.dataset.id);
         handler(e.target.dataset.id);
       }
     });
@@ -18,7 +18,8 @@ class ResultsView extends View {
     this._data.results.map((result) => {
       // showing results from current search page
       const div = document.createElement("div");
-      div.className = `movie-item data-id=${result.id}`;
+      div.className = "movie-item";
+      div.dataset.id = result.id;
       div.innerHTML = `${
         result.poster_path
           ? `
@@ -47,8 +48,8 @@ class ResultsView extends View {
     //console.log("search:", search);
     const dataSearch = document.createElement("div");
     dataSearch.className = "search-header";
-    dataSearch.innerHTML = `your search found ${this._data.totalResults} movies |
-        showing page #${this._data.currentPage} of ${this._data.totalPages}`;
+    dataSearch.innerHTML = `${this._data.totalResults} movies found |
+        page #${this._data.currentPage} of ${this._data.totalPages}`;
     return dataSearch;
   }
 
@@ -56,19 +57,19 @@ class ResultsView extends View {
     const pagination = document.createElement("div");
     pagination.className = "search-pagination";
     if (this._data.currentPage === 1 && this._data.totalPages > 1) {
-      pagination.innerHTML = `<button data-goto="${
+      pagination.innerHTML = `<button btn-light data-goto="${
         this._data.currentPage + 1
-      }" class="btn--inline pagination__btn--next">
-            <span>go to page ${this._data.currentPage + 1}</span>
+      }" class="btn--inline btn-light pagination__btn--next">
+            <span>page ${this._data.currentPage + 1}</span>
           </button>`;
       return pagination;
     }
     // last page
     if (this._data.currentPage === this._data.totalPages) {
-      pagination.innerHTML = `<button data-goto="${
+      pagination.innerHTML = `<button btn-light data-goto="${
         this._data.currentPage - 1
-      }" class="btn--inline pagination__btn--prev">
-          <span>go to page ${this._data.currentPage - 1}</span>
+      }" class="btn--inline btn-light pagination__btn--prev">
+          <span>page ${this._data.currentPage - 1}</span>
         </button>`;
       return pagination;
     }
@@ -78,15 +79,15 @@ class ResultsView extends View {
       this._data.currentPage !== this._data.totalPages
     ) {
       pagination.innerHTML = `
-        <button data-goto="${
+        <button btn-light data-goto="${
           this._data.currentPage - 1
-        }" class="btn--inline pagination__btn--prev">
-          <span>go to page ${this._data.currentPage - 1}</span>
+        }" class="btn--inline btn-light pagination__btn--prev">
+          <span>page ${this._data.currentPage - 1}</span>
         </button>
         <button data-goto="${
           this._data.currentPage + 1
-        }" class="btn--inline pagination__btn--next">
-        <span>go to page ${this._data.currentPage + 1}</span>
+        }" class="btn--inline btn-light pagination__btn--next">
+        <span>page ${this._data.currentPage + 1}</span>
       </button>`;
       return pagination;
     }
