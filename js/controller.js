@@ -12,7 +12,7 @@ import myMoviesView from "./views/myMoviesView.js";
 // https://javascript.info/fetch
 
 // selecting elements from the DOM
-const mainView = document.querySelector(".mainView");
+const mainView = document.querySelector(".main-view");
 const body = document.querySelector("body");
 const searchHeader = document.querySelector(".searchHeader");
 
@@ -23,7 +23,8 @@ const searchHeader = document.querySelector(".searchHeader");
 // CONTROLLER - USER CLICKS TO SEE MOVIE DETAILS
 const controlMovies = async function (id) {
   try {
-    //clearMainView();
+    // clear view
+    clearMainView();
 
     // 1) loading movie
     await model.loadMovie(id);
@@ -38,6 +39,9 @@ const controlMovies = async function (id) {
 // CONTROLLER - USER SUBMIT A SEARCH
 const controlSearchResults = async function () {
   try {
+    // clear view
+    clearMainView();
+
     // 1. get search query
     const query = searchView.getQuery();
     if (!query) return; // without query, guard clause return immediately
@@ -59,7 +63,7 @@ const controlSearchResults = async function () {
 ///////////////////
 
 // SHOW MYMOVIES LIST - BUTTON TOP NAVBAR
-// NEED TO BE REFACTORED AS FUNCTION OR CLASS
+// TODO: NEED TO BE REFACTORED AS FUNCTION OR CLASS
 body.addEventListener("click", function (e) {
   if (e.target.classList.contains("my-movies")) {
     // getting my-movies list from local storage
@@ -75,6 +79,8 @@ body.addEventListener("click", function (e) {
 body.addEventListener("click", function (e) {
   if (e.target.classList.contains("remove")) {
     MovieStorage.removeMovies(model.state.movie.id);
+    // clear view
+    clearMainView();
   }
 });
 
@@ -129,7 +135,7 @@ document.addEventListener("click", function (e) {
     MovieStorage.saveMovies(model.state.movie);
 
     // clear page
-    //clearMainView();
+    clearMainView();
   }
 });
 
@@ -201,10 +207,12 @@ class MovieStorage {
 
 // function to clear results
 const clearMainView = function () {
-  if (document.querySelector(".results"))
-    document.querySelector(".results").innerHTML = "";
-  if (document.querySelector(".movie-details"))
-    document.querySelector(".movie-details").innerHTML = "";
+  if (document.querySelector(".movie-results"))
+    document.querySelector(".movie-results").innerHTML = "";
+  if (document.querySelector(".movie-profile"))
+    document.querySelector(".movie-profile").innerHTML = "";
+  if (document.querySelector(".movie-pagination"))
+    document.querySelector(".movie-pagination").innerHTML = "";
 };
 // clean view clicking brand icon
 const navBarBrand = document.querySelector(".navbar-brand");
@@ -218,6 +226,9 @@ mainView.addEventListener("click", async function (e) {
   // selecting button
   const btn = e.target.closest(".btn--inline");
   if (!btn) return;
+
+  // clear view
+  clearMainView();
 
   // getting number page
   const goToPage = +btn.dataset.goto;

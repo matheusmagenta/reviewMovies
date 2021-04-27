@@ -14,8 +14,9 @@ export default class View {
 
     // check if this._data is search results
     if (this._data.results) {
-      this._parentElement.appendChild(this._generateSearchHeader());
-      this._parentElement.appendChild(this._generatePagination());
+      const moviePagination = document.querySelector(".movie-pagination");
+      moviePagination.appendChild(this._generateSearchHeader());
+      moviePagination.appendChild(this._generatePagination());
     }
 
     Array.isArray(markup)

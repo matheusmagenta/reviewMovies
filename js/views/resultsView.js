@@ -1,7 +1,7 @@
 import View from "./View.js";
 
 class ResultsView extends View {
-  _parentElement = document.querySelector(".results");
+  _parentElement = document.querySelector(".movie-results");
 
   addHandlerClick(handler) {
     this._parentElement.addEventListener("click", function (e) {
@@ -31,9 +31,10 @@ class ResultsView extends View {
           : `<img src="no-poster.jpg" alt="no poster image"/>`
       }  
     <p class="movie-title">${result.title}</p>
-    <a class="movie-details" data-id="${result.id}" href="#">see details</a>
+    
     ${result.year ? `<p class="movie-year">${result.year.slice(0, 4)}</p>` : ""}
-    <p class="vote-average">${result.vote_average}</p>
+    <p class="vote-average"></i>${result.vote_average}</p>
+    <a class="movie-details" data-id="${result.id}" href="#">see details ></a>
     `;
 
       resultsList.push(div);

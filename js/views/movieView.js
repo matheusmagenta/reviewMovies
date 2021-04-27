@@ -2,8 +2,8 @@ import View from "./View.js";
 import * as model from "../model.js";
 
 class MovieView extends View {
-  // !!!!! check if _parentElement is the correct one !!!!
-  _parentElement = document.querySelector(".mainView");
+  // TODO: check if _parentElement is the correct one
+  _parentElement = document.querySelector(".movie-card");
 
   addHandlerRender(handler) {
     //window.addEventListener("click", handler);
@@ -12,7 +12,7 @@ class MovieView extends View {
   _generateMarkup() {
     // show the movie clicked in the view
     const div = document.createElement("div");
-    div.className = "movie-details";
+    div.className = "movie-profile";
     console.log("this data: ", this._data);
     // show movie info
     const markupInfo = `${

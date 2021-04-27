@@ -1,22 +1,100 @@
+@import url("https://fonts.googleapis.com/css2?family=Orelega+One&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .container {
   display: flex;
   justify-content: center;
 }
-.results {
+
+body {
+  padding-top: 70px;
+  font-family: "Orelega", sans-serif;
+}
+
+#movie-search {
+  width: 150px;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: white;
+}
+
+.movie-results {
   display: flex;
   flex-wrap: wrap;
-  height: 1200px;
-  width: 800px;
+  justify-content: center;
+  align-items: center;
 }
-/* flex items */
+
 .movie-item {
   text-align: center;
+
+  font-weight: 400;
+  background-color: #9790a8;
   width: 200px;
-  border: 1px solid black;
   margin: 10px;
+  border-radius: 5px;
+  box-shadow: 5px 5px 9px #d3b378;
+  padding: 10px;
+  transition: 0.5s ease-in-out;
+}
+
+.movie-item:hover {
+  transform: scale(1.05);
+}
+
+.navbar {
+  background-color: #2e2236;
 }
 
 .movie-poster {
   width: 150px;
   height: 190px;
+}
+
+.movie-pagination {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.movie-profile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 400px;
+}
+
+.movie-details {
+  text-decoration: none;
+  color: #212529;
+  cursor: pointer;
+}
+
+.movie-year,
+.vote-average,
+.movie-title {
+  margin: 0;
+  padding: 0;
+}
+
+.movie-title {
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+.movie-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
 }

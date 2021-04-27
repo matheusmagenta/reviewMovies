@@ -5,74 +5,69 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>loved-hated movies</title>
-    <link rel="stylesheet" href="./scss/style.css" />
+
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
       rel="stylesheet"
       integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
       crossorigin="anonymous"
     />
+    <script
+      src="https://kit.fontawesome.com/bfc6d02047.js"
+      crossorigin="anonymous"
+    ></script>
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
       crossorigin="anonymous"
     ></script>
+    <link rel="stylesheet" href="./scss/style.css" />
   </head>
   <body>
-    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-      <a class="navbar-brand" href="./index.html">loved-hated movies</a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-toggle="collapse"
-        data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
+    <nav
+      class="navbar navbar-expand fixed-top navbar-dark"
+      aria-label="Second navbar example"
+      style="background-color: #2e2236"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand" href="./index.html"
+          ><i class="fas fa-film"></i
+        ></a>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav">
-          <li class="nav-item active">
-            <a class="nav-link" href="./index.html">home</a>
-          </li>
+        <ul class="navbar-nav me-auto">
           <li class="nav-item">
-            <a class="nav-link my-movies" href="#">my movies</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">settings</a>
+            <a class="nav-link my-movies" aria-current="page" href="#"
+              >my movies</a
+            >
           </li>
         </ul>
+
+        <form id="movie-form">
+          <div class="input-group">
+            <label for="movie-search"></label>
+            <input
+              type="text"
+              id="movie-search"
+              class="form-control"
+              placeholder="search a movie"
+            />
+            <button
+              type="submit"
+              value="Submit"
+              class="btn btn-outline-light btn-search"
+            >
+              go
+            </button>
+          </div>
+        </form>
       </div>
     </nav>
 
-    <div class="search-div container">
-      <h1 class="display-4 text-center"></h1>
-      <form id="movie-form">
-        <div class="input-group">
-          <label for="movie-search"></label>
-          <input
-            type="text"
-            id="movie-search"
-            class="form-control"
-            placeholder="search a movie"
-          />
-          <button
-            type="submit"
-            value="Submit"
-            class="btn btn-outline-dark btn-search"
-          >
-            go
-          </button>
-        </div>
-      </form>
-    </div>
-    <div class="mainView">
+    <div class="main-view">
       <div class="movie-card"></div>
-      <div class="results"></div>
+      <div class="movie-pagination"></div>
+      <div class="movie-results"></div>
     </div>
     <script type="module" src="./js/controller.js"></script>
   </body>
