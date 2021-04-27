@@ -36,18 +36,25 @@ class MyMoviesView extends View {
               src="https://image.tmdb.org/t/p/w500/${result.poster_path}"
               alt="movie-poster"
               class="movie-poster"
+              style="transform: scale(0.8)"
             />
           `
-          : `<img src="no-poster.jpg" alt="no poster image"/>`
+          : `<img src="no-poster.jpg" alt="no poster image" style="transform: scale(0.8)"/>`
       }  
       <p class="movie-title">${result.title}</p>
       
       ${
         result.year
-          ? `<p class="movie-year">${result.year.slice(0, 4)}</p>`
+          ? `<div class="movie-info"><p class="movie-year">${result.year.slice(
+              0,
+              4
+            )}</p>`
           : ""
       }
-      <p class="vote-average"></i>${result.vote_average}</p>
+      <p class="vote-average"><img class="imdb-logo" src="./imdb-logo.png"> ${
+        result.vote_average
+      }</p>
+      </div>
       <a class="movie-details" data-id="${result.id}" href="#">see details ></a>
       `;
       myMoviesList.push(div);

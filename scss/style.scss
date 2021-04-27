@@ -15,10 +15,6 @@ body {
   font-family: "Orelega", sans-serif;
 }
 
-movie.poster {
-  transform: scale(0.7);
-}
-
 #movie-search {
   width: 150px;
 }
@@ -34,15 +30,24 @@ movie.poster {
   align-items: center;
 }
 
+.imdb-logo {
+  transform: translateY(-1.6px);
+}
+
+.movie-info {
+  display: flex;
+  justify-content: space-evenly;
+}
+
 .movie-item {
   text-align: center;
   font-weight: 400;
-  background-color: #9790a8;
+  background-color: #d2b878;
   width: 200px;
   margin: 10px;
   border-radius: 5px;
   box-shadow: 5px 5px 9px #d3b378;
-  padding: 10px;
+  padding: 20px;
   transition: 0.5s ease-in-out;
 }
 
@@ -51,12 +56,13 @@ movie.poster {
 }
 
 .navbar {
-  background-color: #2e2236;
+  background-color: #d4a373;
 }
 
 .movie-poster {
   width: 150px;
   height: 190px;
+  border-radius: 2px;
 }
 
 .movie-pagination {
@@ -76,8 +82,11 @@ movie.poster {
 
 .movie-details {
   text-decoration: none;
-  color: #212529;
+  background-color: #212529;
+  color: #d2b878;
   cursor: pointer;
+  padding: 5px;
+  border-radius: 2px;
 }
 
 .movie-year,
@@ -87,6 +96,11 @@ movie.poster {
   padding: 0;
 }
 
+.movie-info {
+  font-size: 11px;
+  margin-bottom: 20px;
+}
+
 .btn-light {
   color: white;
   background-color: #2e2236;
@@ -94,8 +108,9 @@ movie.poster {
 }
 
 .movie-title {
-  margin-top: 10px;
-  font-size: 18px;
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
 .movie-card {
@@ -103,6 +118,11 @@ movie.poster {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.movie.poster {
+  width: 100px;
+  height: 135px;
 }
 
 @media (max-width: 768px) {

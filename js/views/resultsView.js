@@ -27,14 +27,25 @@ class ResultsView extends View {
             src="https://image.tmdb.org/t/p/w500/${result.poster_path}"
             alt="movie-poster"
             class="movie-poster"
+            style="transform: scale(0.8)"
           />
         `
-          : `<img src="no-poster.jpg" alt="no poster image"/>`
+          : `<img src="no-poster.jpg" alt="no poster image" style="transform: scale(0.8)"/>`
       }  
     <p class="movie-title">${result.title}</p>
     
-    ${result.year ? `<p class="movie-year">${result.year.slice(0, 4)}</p>` : ""}
-    <p class="vote-average"></i>${result.vote_average}</p>
+    ${
+      result.year
+        ? `<div class="movie-info"><p class="movie-year">${result.year.slice(
+            0,
+            4
+          )}</p>`
+        : ""
+    }
+    <p class="vote-average"><img class="imdb-logo" src="./imdb-logo.png"> ${
+      result.vote_average
+    }</p>
+    </div>
     <a class="movie-details" data-id="${result.id}" href="#">see details ></a>
     `;
 
@@ -49,7 +60,7 @@ class ResultsView extends View {
     const dataSearch = document.createElement("div");
     dataSearch.className = "search-header";
     dataSearch.innerHTML = `${this._data.totalResults} movies found |
-        page #${this._data.currentPage} of ${this._data.totalPages}`;
+        page #${this._data.currentPage} of ${this._data.totalPages} | `;
     return dataSearch;
   }
 

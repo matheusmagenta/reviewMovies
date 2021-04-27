@@ -32,7 +32,9 @@ class MovieView extends View {
         ? `<p class="movie-year">${this._data.year.slice(0, 4)}</p>`
         : ""
     } 
-    <p class="vote-average">${this._data.vote_average}</p>
+    <p class="vote-average"><img class="imdb-logo" src="./imdb-logo.png"> ${
+      this._data.vote_average
+    }</p>
     <p class="overview">
     ${this._data.overview}
     </p>`;
